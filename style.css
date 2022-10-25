@@ -1,0 +1,52 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: rgb(37, 107, 107);
+    font-family: "IBM Plex Serif", sans-serif;
+    text-shadow: 0.2rem 0.2rem 0.5rem rgba(0, 0, 0, 0.63);
+}
+
+h2 {
+    color: rgb(255, 255, 255);
+    font-family: "IBM Plex Serif", sans-serif;
+    font-size: 4rem;
+    margin-bottom: 4rem;
+    text-align: center;
+    letter-spacing: 0.8rem;
+    text-shadow: 0.2rem 0.2rem 0.5rem rgba(0, 0, 0, 0.63);
+}
+
+
+.container-fluid {
+    padding: 3rem;
+}
+
+.btn {
+    background-color: rgba(1, 49, 53, 0.5);
+    width: 100%;
+    margin-top: 3rem;
+    font-size: 2rem;
+    color: rgb(255, 255, 255);
+    border: 1px solid white;
+    box-shadow: 0.2rem 0.3rem 0.4rem rgba(47, 158, 121, 0.3);
+    transition: all 1s ease-in-out;
+    border: none;
+    text-shadow: 0.2rem 0.2rem 0.5rem rgba(0, 0, 0, 0.63);
+}
+
+.btn:hover {
+    background-color: rgb(71, 128, 124);
+    color: white;
+}
+
+
+.plate-option, .cased-options { 
+    display: none;
+}
+
+
+
