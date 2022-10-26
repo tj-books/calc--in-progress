@@ -24,7 +24,7 @@
             <h2 class="mt-lg-5" id="title">TJ Books Printing Calculator</h2>
         </div>
         <div class="row pt-2 text-light h5"> 
-            <div class="col-lg-6 left px-5 mt-2">
+            <div class="col-lg-5 left px-5 mt-2">
                 <form>
                     <div class="row print-row">
                         <!--Print Method Select -->
@@ -58,7 +58,7 @@
                     <div class="row">
                         <!--Extent Input-->
                         <div class="col-lg-3 mb-1 pt-2">
-                            <label for="extent" class="col-form-label col-form-label-md">Extent (Exc Plates):</label>
+                            <label for="extent" class="col-form-label col-form-label-md">Extent (Excl. Plates):</label>
                             <input required type="number" class="form-control form-control-lg" id="extent" placeholder="Enter Extent">
                         </div>
                         <!--Trim Height-->
@@ -73,7 +73,7 @@
                         </div>
                         <!--Case Style Select -->
                         <div class="col-lg-3 pt-2 mb-1">
-                            <label for="case-style" class="col-form-label col-form-label-md">Case Style</label>
+                            <label for="case-style" class="col-form-label col-form-label-md">Limp/ PPC/ Cloth</label>
                             <select required id="case-style" class="form-select form-select-lg"
                                 aria-label="">
                                 <option selected value="none">Case Style</option>
@@ -168,6 +168,119 @@
                             <input required type="number" class="form-control form-control-lg" id="qty" placeholder="Enter Quantity">
                         </div>
                     </div>
+
+                    <div class="row">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label for="additional" class="col-form-label col-form-label-md">Additional Options:</label>
+                            </div>
+
+                            
+                        
+                        </div>
+                        <div class="additional-options row">
+
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-4">
+                                        <label for="pantone">Pantones</label>
+                                    </div>
+                                    <div class="col-1">
+                                        <input type="checkbox" id="pantone">
+                                    </div>
+                                    <div class="col-5">
+                                        <input id="pantone-coverage" class="hidden form-control form-control-sm" type="number" placeholder="% Coverage">
+                                    </div>
+                                </div>  
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <label for="soft-touch">SoftTouch/AntiScuff</label>
+                                    </div>
+                                    <div class="col-1">
+                                        <input type="checkbox" id="soft-touch">
+                                    </div>
+                                </div>  
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-4">
+                                        <label for="foil-front">Foil-Front</label>
+                                    </div>
+                                    <div class="col-1">
+                                        <input type="checkbox" id="foil-front">
+                                    </div>
+                                    <div class="col-5">
+                                        <input id="foil-front-measurement" class="hidden form-control form-control-sm" type="number" placeholder="Artwork Width">
+                                    </div>
+                                </div>  
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <label for="emboss">Emboss/Deboss</label>
+                                    </div>
+                                    <div class="col-1">
+                                        <input type="checkbox" id="emboss">
+                                    </div>
+                                </div>  
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-4">
+                                        <label for="foil-back">Foil-Back</label>
+                                    </div>
+                                    <div class="col-1">
+                                        <input type="checkbox" id="foil-back">
+                                    </div>
+                                    <div class="col-5">
+                                        <input id="foil-back-measurement" class="hidden form-control form-control-sm" type="number" placeholder="Artwork Width">
+                                    </div>
+                                </div>  
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <label for="head-tail">Head & Tail Bands</label>
+                                    </div>
+                                    <div class="col-1">
+                                        <input type="checkbox" id="head-tail">
+                                    </div>
+                                </div>  
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-4">
+                                        <label for="spot-uv">Spot UV</label>
+                                    </div>
+                                    <div class="col-1">
+                                        <input type="checkbox" id="spot-uv">
+                                    </div>
+                                    <div class="col-5">
+                                        <select name="spot-uv-bleeds" id="spot-uv-bleeds" class="hidden form-select form-select-sm">
+                                            <option selected value="no-bleeds">No Bleeds</option>
+                                            <option value="with-bleeds">With Bleeds</option>
+                                        </select>
+                                    </div>
+                                </div>  
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <label for="ribbon">Ribbon Markers</label>
+                                    </div>
+                                    <div class="col-1">
+                                        <input type="checkbox" id="ribbon">
+                                    </div>
+                                </div>  
+                            </div>
+
+
+                        </div>
+                        
+
+                    </div>
                 </form>
                 <div class="row">
                     <div class="col-12">
@@ -180,11 +293,44 @@
 
 
 
-            <div class="col-lg-6 right text-dark">
-                <div class="results">
-                    <h6 class="text-white text-center">RESULTS</h6>
-                    <span id="results"></span>
+            <div class="col-lg-7 results-section right text-light">
+                <div class="row">
+                    <h6 class="text-white h5 text-center">RESULTS</h6>
                 </div>
+                <div class="row mt-3 item-1 headings text-center">
+                    <div class="col col-lg-1 results-heading">
+                        <p>JOB PART</p>
+                    </div>
+                    <div class="col col-lg-1 results-heading">
+                        <p>PRESS</p>
+                    </div>
+                    <div class="col col-lg-1 results-heading">
+                        <p>INK</p>
+                    </div>
+                    <div class="col col-lg-1 results-heading">
+                        <p>SPINE</p>
+                    </div>
+                    <div class="col col-lg-2 results-heading">
+                        <p>SIZE</p>
+                    </div>
+                    <div class="col col-lg-2 results-heading">
+                        <p>SHEET SIZE</p>
+                    </div>
+                    <div class="col col-lg-1 results-heading">
+                        <p>NO. UP</p>
+                    </div>
+                    <div class="col col-lg-1 results-heading">
+                        <p>NO. SHEETS</p>
+                    </div>
+                    <div class="col col-lg-1 results-heading">
+                        <p>EXTRAS</p>
+                    </div>
+                    <div class="col col-lg-1 results-heading">
+                    </div>
+                </div>  
+              
+ 
+   
             </div>
         </div>
     </div>
