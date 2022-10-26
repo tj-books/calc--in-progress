@@ -14,6 +14,18 @@ let paper;
 let grammage;
 let platePaper;
 let plateGrammage;
+let pantone;
+let pantoneCoverage;
+let foilFront;
+let foilFrontCoverage;
+let foilBack;
+let foilBackCoverage;
+let spotUV;
+let spotUVBleeds;
+let softTouch;
+let headTail;
+let emboss;
+let ribbon;
 
 
 
@@ -56,13 +68,12 @@ let paperOptions = {
         ["Munken Premium Cream", 80, 90], 
         ["Munken Premium White", 80, 90],
         ["TJ Mechanical Cream", 60, 70],
-        ["TJ Uncoated", 80, 90, 100, 120],
+        ["TJ Uncoated", 70, 80, 90, 100, 120],
         ["TJ Gloss", 90, 115, 130, 150],
         ["TJ Matt", 70, 80, 90, 115, 130],
         ["TJ Silk", 90, 100, 115, 130, 150, 170],
         ["Munken Pure", 80, 100, 120, 150],
         ["TJ Mechanical White", 70],
-        ["TJ Preprint", 70],
         ["Munken Lynx", 120, 150]
     ],
     "digital": [
@@ -124,6 +135,7 @@ document.querySelector("#case-style").addEventListener("click", (e)=> {
 document.querySelector("#plates").addEventListener("click", ()=> {
     if (document.querySelector("#plates").value === "yes") {
         document.querySelector(".plate-extent").style.display = "block"
+        document.querySelector("#plate-paper").innerHTML = "<option selected disabled>Plate Paper Type</option>"
         for (let i=0; i<paperOptions["plates"].length; i++) {
             let newOption = document.createElement("option")
             newOption.value = paperOptions["plates"][i][0]
@@ -145,6 +157,21 @@ document.querySelector("#plate-paper").addEventListener("click", (e)=> {
         document.querySelector("#plate-grammage").appendChild(newOption);
     }
 })
+
+document.querySelector("#pantone").addEventListener("click", ()=> {
+    document.querySelector("#pantone-coverage").classList.toggle("hidden")
+})
+document.querySelector("#foil-front").addEventListener("click", ()=> {
+    document.querySelector("#foil-front-measurement").classList.toggle("hidden")
+})
+document.querySelector("#foil-back").addEventListener("click", ()=> {
+    document.querySelector("#foil-back-measurement").classList.toggle("hidden")
+})
+document.querySelector("#spot-uv").addEventListener("click", ()=> {
+    document.querySelector("#spot-uv-bleeds").classList.toggle("hidden")
+})
+
+
 
 document.querySelector("#submit").addEventListener("click", ()=> {  
     
@@ -170,14 +197,75 @@ document.querySelector("#submit").addEventListener("click", ()=> {
     colour = document.querySelector("#colourSelect").value
     paper = document.querySelector("#paper-type").value
     grammage = document.querySelector("#grammage").value
-    
-    console.log(printOption, bindOption, colour, caseOption, plates, jacket, spineStyle, greyboardThickness, extent, quantity, trimHeight, trimWidth, paper, grammage, platePaper, plateGrammage)
+    pantone = document.querySelector("#pantone").checked
+    if (pantone) {
+        pantoneCoverage = document.querySelector("#pantone-coverage").value
+    }
+    foilFront = document.querySelector("#foil-front").checked
+    if (foilFront) {
+        foilFrontCoverage = document.querySelector("#foil-front-measurement").value
+    }
+    foilBack = document.querySelector("#foil-back").checked
+    if (foilBack) {
+        foilBackCoverage = document.querySelector("#foil-back-measurement").value
+    }
+    spotUV = document.querySelector("#spot-uv").checked
+    if (spotUV) {
+        spotUVBleeds = document.querySelector("#spot-uv-bleeds").value
+    }
+    softTouch = document.querySelector("#soft-touch").checked
+    headTail = document.querySelector("#head-tail").checked
+    emboss = document.querySelector("#emboss").checked
+    ribbon = document.querySelector("#ribbon").checked
+    console.log(printOption, bindOption, colour, caseOption, plates, jacket, spineStyle, greyboardThickness, extent, quantity, trimHeight, trimWidth, paper, grammage, platePaper, plateGrammage, "pantone", pantone, pantoneCoverage, "foilFront", foilFront, foilFrontCoverage, "foilBack", foilBack, foilBackCoverage, "spotUV", spotUV, spotUVBleeds, "softtouch", softTouch, "headt", headTail, "ribbon", ribbon, "emboss", emboss)
 })
 
 
 
-
-
+const createResult = (part, partPress, partInk, partSpine, partSize, partSheetSize, partNumUp, partNumSheets, partExtras, partExtrasInfo, partInfo)=> {
+    let newElement = document.createElement("div")
+    newElement.classList.add("row")
+    newElement.classList.add("results")
+    newElement.classList.add("mt-3")
+    newElement.innerHTML = `
+    <div class="${part}-part col col-lg-1">
+    <p></p>
+</div>
+<div class="col col-lg-1">
+    <p>${partPress}</p>
+</div>
+<div class="col col-lg-1">
+    <p>${partInk}</p>
+</div>
+<div class="col col-lg-1">
+<p>${partSpine}</p>
+</div>
+<div class="col col-lg-2">
+<p>${partSize}</p>
+</div>
+<div class="col col-lg-2">
+<p>${partSheetSize}</p>
+</div>
+<div class="col col-lg-1">
+<p>${partNumUp}</p>
+</div>
+<div class="col col-lg-1">
+<p>${partNumSheets}</p>
+</div>
+<div class="col col-lg-1">
+<p>${partExtras}</p>
+</div>
+<div class="col col-lg-1">
+<p>${partExtrasInfo}</p>
+</div>
+</div> 
+<div class="row">
+<div class="added-info col-lg-11 ms-auto">
+<p>${partInfo}</p>
+</div>
+    `
+    document.querySelector(".results-section").appendChild(newElement)
+}
 
 
 
