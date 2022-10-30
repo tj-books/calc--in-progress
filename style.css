@@ -5,7 +5,7 @@
 }
 
 body {
-    background: rgb(37, 107, 107);
+    background: rgb(1, 75, 75);
     font-family: "IBM Plex Serif", sans-serif;
     text-shadow: 0.2rem 0.2rem 0.5rem rgba(0, 0, 0, 0.63);
 }
@@ -49,7 +49,9 @@ p {
     color: white;
 }
 
-
+.text-pantone-hidden {
+    display: none;
+}
 
 .plate-option, .cased-options { 
     display: none;
@@ -57,7 +59,9 @@ p {
 
 .headings {
     border-radius: 0.25rem;
-    background:rgb(71, 128, 124);
+    background: rgba(1, 49, 53, 0.5);
+    box-shadow: -0.1rem 0.1rem 0.2rem rgba(47, 158, 121, 0.3);
+
 }
 
 .results-heading {
@@ -113,7 +117,10 @@ p {
 
 .results p {
     font-size: 1rem;
-    text-align: center;
+}
+
+.results div p {
+    text-align: left;
 }
 
 .added-info {
@@ -139,7 +146,17 @@ p {
     visibility: hidden;
 }
 
+.no-display {
+    height: 0;
+    visibility: hidden;
+}
+
 .n-a {
     color: rgb(187, 185, 185);
     opacity: 0.3;
 }
+
+.Toner-PPCadjust, .GreyBoardadjust, .Text-16ppadjust, .Text-32ppadjust, .Text-8ppadjust, .Greyboardadjust {
+    display: none;
+}
+
