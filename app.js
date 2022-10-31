@@ -140,6 +140,7 @@ let lithoSheets = {
         width: 900
     }]
 }
+
 //Show input areas when certain options are selected
 let showMore = (objectSelected, inputArea)=> {
     document.querySelector(`${objectSelected}`).addEventListener("click", ()=> {
@@ -157,31 +158,29 @@ let createNewOption = (arr, newParent, originalHTML, needsIterating, firstElemen
         return
     } else {
         let parent = document.querySelector(`${newParent}`)
-    parent.innerHTML = `<option selected disabled>${originalHTML}</option>`
-    if (needsIterating === true) {
-        let newArr = []
-        for (let item of arr) {
-            if (firstElement) {
-                newArr.push(item[0])
-            } else {
-                if (item.indexOf(selectedPaper)===0) {
+        parent.innerHTML = `<option selected disabled>${originalHTML}</option>`
+        if (needsIterating === true) {
+            let newArr = []
+            for (let item of arr) {
+                if (firstElement) {
+                    newArr.push(item[0])
+                } else if (item.indexOf(selectedPaper)===0){
                     for (let i=1; i<item.length; i++) {
                         newArr.push(item[i])
                     }
-                } 
-            }    
+                }
+            }
+            createNewOption(newArr, newParent, originalHTML, false, false, false)
+            return                  
+        } else {
+            for (let item of arr) {
+                let newOption = document.createElement("option")
+                newOption.value = item
+                newOption.innerHTML = item
+                parent.appendChild(newOption)
+            }
+            return
         }
-        createNewOption(newArr, newParent, originalHTML, false, false, false)
-        return
-    } else {
-        for (let item of arr) {
-            let newOption = document.createElement("option")
-            newOption.value = item
-            newOption.innerHTML = item
-            parent.appendChild(newOption)
-        }
-        return
-    }
     }    
 }
 
@@ -189,12 +188,7 @@ let createNewOption = (arr, newParent, originalHTML, needsIterating, firstElemen
 document.querySelector("#print-method").addEventListener("change", (e)=> {
     createNewOption(bindOptions[document.querySelector("#print-method").value], "#bind-method", "Bind Method", false, false, false)
     createNewOption(paperOptions[document.querySelector("#print-method").value], "#paper-type", "Paper Type", true, true, false)
-    if (document.querySelector("#print-method").value==="litho") {
-        document.querySelector(".text-pantone").classList.remove("text-pantone-hidden")
-    } else {
-        document.querySelector(".text-pantone").classList.add("text-pantone-hidden")
-    }
-
+    document.querySelector("#print-method").value==="litho" ? document.querySelector(".text-pantone").classList.remove("text-pantone-hidden") : document.querySelector(".text-pantone").classList.add("text-pantone-hidden")
 })
 
 //Select Paper type- Update Options for Grammage
@@ -205,13 +199,8 @@ document.querySelector("#paper-type").addEventListener("click", (e)=> {
 
 //Select Plates- Update Options for Plate Paper
 document.querySelector("#plates").addEventListener("click", ()=> {
-    if (document.querySelector("#plates").value === "yes") {
-        document.querySelector(".plate-extent").style.display = "inline" 
-        createNewOption(paperOptions["plates"], "#plate-paper", "Plate Paper Type", true, true, false)
-    }
-    else {
-        document.querySelector(".plate-extent").style.display = "none"
-    }
+    document.querySelector(".plate-extent").style.display = document.querySelector("#plates").value !== "yes" ? "none" : "inline"
+    createNewOption(paperOptions["plates"], "#plate-paper", "Plate Paper Type", true, true, false)
 })
 
 //Select Plate Paper- Update Options for Grammage
@@ -220,68 +209,32 @@ document.querySelector("#plate-paper").addEventListener("click", (e)=> {
     createNewOption(paperOptions["plates"], "#plate-grammage", "Grammage", true, false, selectedPaper)
 })
 
-
-//Function to update display options after chosing the case type
-let showRelevantOptions = (plate, plateExtent, casedOptions, jacketValue)=> {
-        document.querySelector(".plate-option").style.display = plate
-        document.querySelector(".plate-extent").style.display = plateExtent
-        document.querySelector(".cased-options").style.display = casedOptions
-        document.querySelector("#jackets").value = jacketValue
-}
-
 //Select Case Type- Update Options Available for Plates, Case Finishes etc.
 document.querySelector("#case-style").addEventListener("click", (e)=> {
     let value = document.querySelector("#case-style").value
-    let extentDisplay;
-    //If plates have already been selected, keep the plate extent option visible
-    if (document.querySelector("#plates").value === "yes") {
-        extentDisplay = "inline"
-    } else {
-        extentDisplay = "none"
-    }
-    if (value === "4pp" || value === "8pp") {
-        showRelevantOptions("inline", extentDisplay, "none", "no")
-    }
-    else if (value === "PPC") {
-        showRelevantOptions("inline", extentDisplay, "inline", "no")
-        
-    }
-    else if (value === "Cloth") {
-        showRelevantOptions("inline", extentDisplay, "inline", "yes")
-    }
-    else {
-        showRelevantOptions("none", "none", "none", "no")
-    }
+    let plateOption = value === "none"? "none" : "inline"
+    let plateValue = document.querySelector("#plates").value === "yes" ? "inline" : "none"
+    let caseOptionValue = value === "4pp" || value === "8pp" ? "none" : "inline"
+    let jacketValue = value === "Cloth" ? "yes" : "no"
+    document.querySelector(".plate-option").style.display = plateOption
+    document.querySelector(".plate-extent").style.display = plateValue
+    document.querySelector(".cased-options").style.display = caseOptionValue
+    document.querySelector("#jackets").value = jacketValue
 })
+
 
 let notApplicable = `<span class="n-a">N/A</span>`
 let spine;
-let additionalHollow = 0;
 
 let sheetCalc = (part, press)=> {
-    if (press === "KBA 3") {
-        return "720 x 1020"
-    } else if (press === "Outwork" || !press) {
-        return notApplicable
-    } else {
-        let basicWidth = trimWidth*2+spine       
-        if (spineStyle === "pressPahn") {
-            additionalHollow = 2
-        } else if (spineStyle === "boardHollow") {
-            additionalHollow = 4
-        }
-        if (basicWidth+40+additionalHollow <=417 && part === "PPC" || basicWidth <=402 && part === "fourPage") {
-            return "320 x 450"
-        } else if (basicWidth+200 <=492 && part === "Jacket" || basicWidth+40+additionalHollow <=536 && part === "PPC" || basicWidth+209 <=546 && part === "eightPage" || basicWidth <= 512 && part === "fourPage") {
-            return "320 x 560"
-        } else if (basicWidth+200 <=597 && part === "Jacket") {
-            return "320 x 660"
-        } else if (basicWidth+ 200 > 597) {
-            return "320 x 700"
-        } else {
-            return "Seek Advice"
-        }
-    }
+    let basicWidth = trimWidth*2+spine
+    return press === "KBA 3" ? "720 x 1020"
+    : press === "Outwork" || !press ? notApplicable 
+    : basicWidth+40+parseInt(spineStyle) <=417 && part === "PPC" || basicWidth <=402 && part === "fourPage" ? "320 x 450"
+    : basicWidth+200 <=492 && part === "Jacket" || basicWidth+40+parseInt(spineStyle) <=536 && part === "PPC" || basicWidth+209 <=546 && part === "eightPage" || basicWidth <= 512 && part === "fourPage" ? "320 x 560"
+    : basicWidth+200 <=597 && part === "Jacket" ? "320 x 660"
+    : basicWidth+ 200 > 597 && part === "Jacket" ? "320 x 700"
+    : "Seek Advice"
 } 
 
 let generateGreyboardSizes = (arr, newArr) => {
@@ -291,42 +244,24 @@ let generateGreyboardSizes = (arr, newArr) => {
 }
 
 let checkCoverPress = (maxQty) => {
-    if (spotUV && spotUVBleeds === "with-bleeds" || foilFront || foilBack || emboss) {
-        return "Outwork"
-    } else if (pantone || quantity >= maxQty) {
-        return "KBA 3"
-    } else if (caseOption === "4pp" && printOption === "digital" && !spotUV) {
-        return "Ricoh 9210"
-    } else {
-        return "Ricoh 9200"
-    }
+    return spotUV && spotUVBleeds === "with-bleeds" || foilFront || foilBack || emboss ? "Outwork" 
+    : pantone || quantity >= maxQty ? "KBA 3"
+    : caseOption === "4pp" && printOption === "digital" && !spotUV ? "Ricoh 9210"
+    : "Ricoh 9200"
 }
+
 let checkCoverInk = ()=> {
-    if (pantone) {
-        return "5/0"
-    } else {
-        return "4/0"
-    }
+    return pantone ? "5/0" : "4/0"
 }
 
 let caseSpine = (thickness)=> {
     return Math.round(textSpine + (parseInt(thickness)/100)*2)
 }
+
 let textSpine;
 let calcSpineWidth = ()=> {   
-    if (plates>0) {
-        textSpine = (((volumes[paper] * grammage) * extent )/20000)+ 0.6 + (((volumes[platePaper] * plateGrammage) * plates)/20000)
-    } else {
-        textSpine = (((volumes[paper] * grammage) * extent )/20000)+ 0.6
-    }
-    if (caseOption === "4pp" || caseOption === "8pp") {
-        spine = Math.round(textSpine)
-        return spine
-    }
-    else if (caseOption === "Cloth" || caseOption === "PPC") {
-        spine = caseSpine(greyboardThickness)
-        return spine
-    } 
+    textSpine = plates>0 ? (((volumes[paper] * grammage) * extent )/20000)+ 0.6 + (((volumes[platePaper] * plateGrammage) * plates)/20000) : (((volumes[paper] * grammage) * extent )/20000)+ 0.6
+    return caseOption === "4pp" || caseOption === "8pp" ? Math.round(textSpine) : caseSpine(greyboardThickness)
 }
 
 let calculateCoverNumSheets = (percent, makeReady, numUp)=> {
@@ -342,27 +277,16 @@ let options = {
         spine: function () {return calcSpineWidth()},
         size: function () {return `${parseInt(trimHeight) + 18}mm x ${(trimWidth*2)+ this.spine() +192}mm`},
         sheetSize: function () {return sheetCalc("Jacket", this.press())},
-        numUp: function () {
-            if (this.press() === "Ricoh 9200") {
-                return 1
-            } else if (this.press() === "KBA 3"){
-                if (!spotUV) {
-                    return 3
-                } else {
-                    return 2
-                }
-            } else {
-                return notApplicable
-            }   
+        numUp: function () { 
+            return this.press() === "Ricoh 9200" ? 1
+            : this.press() === "KBA 3" && !spotUV ? 3
+            : this.press() === "KBA 3" && spotUV ? 2
+            : notApplicable 
         },
         numSheets: function () {
-            if (this.press() === "KBA 3") {
-                return calculateCoverNumSheets(1.1, 150, this.numUp())
-            } else if (this.press() === "Ricoh 9200")  {
-                return calculateCoverNumSheets(1.085, 2, this.numUp())
-            } else {
-                return notApplicable
-            }
+            return this.press() === "KBA 3" ? calculateCoverNumSheets(1.1, 150, this.numUp())
+            : this.press() === "Ricoh 9200" ? calculateCoverNumSheets(1.085, 2, this.numUp())
+            : notApplicable
         },
         extras: function () {return ""},
         extrasInfo: function () {return ""},
@@ -374,32 +298,16 @@ let options = {
         press: function () {return notApplicable},
         ink: function () {return notApplicable},
         spine: function () {return calcSpineWidth()},
-        size: function () {
-            if (spineStyle === "pressPahn") {
-                additionalHollow = 2
-            } else if (spineStyle === "boardHollow") {
-                additionalHollow = 4
-            }
-            return `${parseInt(trimHeight)+38}mm x ${(trimWidth * 2)+this.spine()+additionalHollow+40}mm`},
+        size: function () {return `${parseInt(trimHeight)+38}mm x ${(trimWidth * 2)+this.spine()+parseInt(spineStyle)+40}mm`},
         sheetSize: function () {return "640 x 970"},
         numUp: function () {
-          let clothHeight;
-          let clothWidth;  
-          if (this.sheetSize() === "640 x 970") {
-            clothHeight = 640;
-            clothWidth = 970;
-          } else if (this.sheetSize() === "1020 x 760") {
-            clothHeight = 1020;
-            clothWidth = 760;
-          } else if (this.sheetSize() === "1020 x 850") {
-            clothHeight = 1020;
-            clothWidth = 850;
-          }
+          let clothHeight = this.sheetSize() === "640 x 970" ? 970
+          : this.sheetSize() === "1020 x 760" ? 760
+          : 850 
+          let clothWidth = this.sheetSize() === "640 x 970" ? 640 : 1020  
           return Math.floor((clothHeight/(parseInt(trimHeight)+38)))*Math.floor((clothWidth/((trimWidth*2)+this.spine()+40)))
         },
-        numSheets : function () {
-            return Math.round((quantity/this.numUp())*1.1)
-        },
+        numSheets : function () {return Math.round((quantity/this.numUp())*1.1)},
         extras: function () {return ""},
         extrasInfo: function () {return ""},
         info: function () {return ""},
@@ -410,37 +318,19 @@ let options = {
         press: function () {return checkCoverPress(6001)},
         ink: function () {return checkCoverInk()},
         spine: function () {return calcSpineWidth()},
-        size: function () {
-            if (spineStyle === "pressPahn") {
-                additionalHollow = 2
-            } else if (spineStyle === "boardHollow") {
-                additionalHollow = 4
-            }
-            return `${parseInt(trimHeight) + 38}mm x ${(trimWidth*2)+this.spine()+additionalHollow+40}mm`},
+        size: function () {return `${parseInt(trimHeight) + 38}mm x ${(trimWidth*2)+this.spine()+parseInt(spineStyle)+40}mm`},
         sheetSize: function () {return sheetCalc("PPC", this.press())},
         numUp: function() {
-            if (this.press() === "Ricoh 9200") {
-                return 1
-            } else if (this.press() === "KBA 3"){
-                if (spotUV && parseInt(trimHeight)<=234 && parseInt(trimWidth)<=156 && this.sheetSize()==="640 x 900") {
-                    return 2
-                } else if (parseInt(trimHeight)<=234 && parseInt(trimWidth)<=156) {
-                    return 3
-                } else {
-                    return "Seek Advice"
-                }
-            } else {
-                return notApplicable
-            }   
+            return this.press() === "Ricoh 9200" ? 1
+            : this.press() === "KBA 3" && spotUV && parseInt(trimHeight)<=234 && parseInt(trimWidth)<=156 && this.sheetSize()==="640 x 900" ? 2
+            : this.press() === "KBA 3" && parseInt(trimHeight)<=234 && parseInt(trimWidth)<=156 ? 3
+            : this.press() === "KBA 3" ? "Seek Advice"
+            : notApplicable 
         },
         numSheets: function () {
-            if (this.press() === "KBA 3") {
-                return calculateCoverNumSheets(1.25, 100, this.numUp())
-            } else if (this.press() === "Ricoh 9200")  {
-                return calculateCoverNumSheets(1.25, 2, this.numUp())
-            } else {
-                return notApplicable
-            }
+            return this.press() === "KBA 3" ? calculateCoverNumSheets(1.25, 100, this.numUp())
+            : this.press() === "Ricoh 9200" ? calculateCoverNumSheets(1.25, 2, this.numUp())
+            : notApplicable
         },
         extras: function () {return ""},
         extrasInfo: function () {return ""},
@@ -455,32 +345,17 @@ let options = {
         size: function () {return `${parseInt(trimHeight)+20}mm x ${(trimWidth*2)+this.spine()+209}mm`},
         sheetSize: function () {return sheetCalc("eightPage", this.press())},
         numUp: function () {
-            if (this.press()==="Ricoh 9200") {
-                return 1
-            } else if (this.press() === "KBA 3") {
-                if (parseInt(trimHeight)<=234 && parseInt(trimWidth)<=156 && this.sheetSize()==="720 x 1020") {
-                    return 4
-                } else if (parseInt(trimHeight)<=234 && parseInt(trimWidth)<=156 && this.sheetSize()=== "640 x 900") {
-                    return 3
-                } else {
-                    if (this.sheetSize() ==="720 x 1020") {
-                        return 3
-                    } else {
-                        return 2
-                    }
-                }
-            } else {
-                return notApplicable;
-            }
+            return this.press()==="Ricoh 9200" ? 1
+            : this.press() === "KBA 3" && parseInt(trimHeight)<=234 && parseInt(trimWidth)<=156 && this.sheetSize()==="720 x 1020" ? 4
+            : this.press() === "KBA 3" && parseInt(trimHeight)<=234 && parseInt(trimWidth)<=156 && this.sheetSize()=== "640 x 900" ? 3
+            : this.press() === "KBA 3" && this.sheetSize() ==="720 x 1020" ? 3
+            : this.press() === "KBA 3" ? 2
+            : notApplicable
         },
         numSheets: function () {
-            if (this.press()==="KBA 3") {
-                return calculateCoverNumSheets(1.15, 150, this.numUp());
-            } else if (this.press() === "Ricoh 9200") {
-                return calculateCoverNumSheets(1.15, 2, this.numUp())
-            } else {
-                return notApplicable;
-            }
+            return this.press()==="KBA 3" ? calculateCoverNumSheets(1.15, 150, this.numUp())
+            : this.press() === "Ricoh 9200" ? calculateCoverNumSheets(1.15, 2, this.numUp())
+            : notApplicable
         },
         extras: function () {return ""},
         extrasInfo: function () {return ""},
@@ -495,34 +370,17 @@ let options = {
         size: function () {return `${parseInt(trimHeight)+20}mm x ${(trimWidth*2)+this.spine()+9}mm`},
         sheetSize: function () {return sheetCalc("fourPage", this.press())},
         numUp: function () {
-            if (this.press()==="Ricoh 9200" || this.press() === "Ricoh 9210") {
-                return 1
-            } else if (this.press() === "KBA 3") {
-                if (!spotUV) {
-                    if (parseInt(trimHeight)<=234 && parseInt(trimWidth)<=156) {
-                        return 8
-                    } else {
-                        return 4
-                    }
-                } else {
-                    if (this.sheetSize()=== "720 x 1020") {
-                        return 4
-                    } else {
-                        return "Use Larger Sheet"
-                    }
-                }
-            } else {
-                return notApplicable
-            }
+            return this.press()==="Ricoh 9200" || this.press() === "Ricoh 9210" ? 1
+            : this.press() === "KBA 3" && !spotUV && parseInt(trimHeight)<=234 && parseInt(trimWidth)<=156 ? 8
+            : this.press() === "KBA 3" && !spotUV ? 4
+            : this.press() === "KBA 3" && this.sheetSize()=== "720 x 1020" ? 4
+            : this.press() === "KBA 3" ? "Use Larger Sheet" 
+            : notApplicable
         },
         numSheets: function () {
-            if (this.press() === "KBA 3") {
-                return calculateCoverNumSheets(1.1, 150, this.numUp())
-            } else if (this.press() === "Ricoh 9200" || this.press()=== "Ricoh 9210") {
-                return calculateCoverNumSheets(1.1,2,this.numUp())
-            } else {
-                return notApplicable;
-            }
+            return this.press() === "KBA 3" ? calculateCoverNumSheets(1.1, 150, this.numUp())
+            : this.press() === "Ricoh 9200" || this.press()=== "Ricoh 9210" ? calculateCoverNumSheets(1.1,2,this.numUp())
+            : notApplicable
         },
         extras: function () {return ""},
         extrasInfo: function () {return ""},
@@ -537,13 +395,12 @@ let options = {
         sheetSize: ()=> {
             let possibleSizes = []
             generateGreyboardSizes([4,3,5], possibleSizes)
-            console.log(possibleSizes)
             for (let item of possibleSizes) {
                 if (greyBoardStock[greyboardThickness][item]) {
                     return item
                 }
             }
-                return "760 x 1020"
+            return "760 x 1020"
         },
         numUp: function () {return notApplicable},
         numSheets: function() {return notApplicable},
@@ -557,41 +414,113 @@ let options = {
         press: function () {return notApplicable},
         ink: function () {return notApplicable},
         spine: function () {return notApplicable},
-        size: function () {
-            return `${parseInt(trimHeight)+6}mm x ${(trimWidth * 2)+6}mm`
-        },
+        size: function () {return `${parseInt(trimHeight)+6}mm x ${(trimWidth * 2)+6}mm`},
         sheetSize: function () {return "720 x 1020"},
-        numUp: function () {
-            if (this.sheetSize() === "1020 x 760") {
-                return 789
-            } else {
-                return 500
-            }  
-        },
-        numSheets: function () {
-            return 10
-        },
+        numUp: function () { return "Add Calc"},
+        numSheets: function () { return "Add Calc"},
         extras: function () {return ""},
         extrasInfo: function () {return ""},
         info:function () {return ""}
     },
+    "Text-Litho" : {
+        part: function() {return lithoCalc("partTitle")},
+        press: function () {return lithoCalc("press")},
+        ink: function() {return lithoCalc("ink")},
+        size: function() {return `${trimHeight}mm x ${trimWidth}mm`},
+        spine: function() {return notApplicable},
+        sheetSize: function () {return lithoCalc("sheetSize")},
+        numUp: function() {return lithoCalc("numUp")},
+        numSheets: function() {return "Add Calc"},
+        extras: function() {return lithoCalc("sigBreakdown")},
+        extrasInfo: function() {return ""},
+        info: function() {return ""}                 
+    },
+    "Oddment-16": {
+        part: function () {return "Text-16pp"},
+        press: function () {return options["Text-Litho"].press()},
+        ink: function () {return options["Text-Litho"].ink()},
+        size: function () {return options["Text-Litho"].size()},
+        spine: function() {return notApplicable},
+        sheetSize: function () {return options["Text-Litho"].sheetSize()},
+        numUp: function () {return lithoCalc("oddment16NumUp")},
+        numSheets: function() {return "Add Calc"},
+        extras: function() {return ""},
+        extrasInfo: function() {return ""},
+        info: function (){return ""},
+    },
+    "Oddment-8": {
+        part: function () {return "Text-8pp"},
+        press: function () {return options["Text-Litho"].press()},
+        ink: function () {return options["Text-Litho"].ink()},
+        size: function () {return options["Text-Litho"].size()},
+        spine: function() {return notApplicable},
+        sheetSize: function () {return options["Text-Litho"].sheetSize()},
+        numUp: function () {return lithoCalc("oddment8NumUp")},
+        numSheets: function() {return "Add Calc"},
+        extras: function() {return ""},
+        extrasInfo: function() {return ""},
+        info: function (){return ""},
+    },
+
 }
+
+let oddment16 = false;
+let oddment8 = false;
+
+let lithoCalc = (value) => {
+    if (value === "press") {
+        return colour === "mono" && !textPantone ? "KBA 1" : "KBA 3"
+    }
+    if (value === "ink") {
+        return colour === "mono" && !textPantone ? "1/1"
+        : colour === "mono" ? "2/2"
+        : "4/4"
+    } 
+    let sizes = []
+    let impStandardHeight = (parseInt(trimHeight)+6)*4
+    let imp64Width = (parseInt(trimWidth)+3)*8
+    let imp48Width = (parseInt(trimWidth)+3)*6
+    let imp32Width = (parseInt(trimWidth)+3)*4
+    let imp16Height = (parseInt(trimHeight)+6)*2
+    sizes.push(impStandardHeight, imp64Width, impStandardHeight, imp48Width, impStandardHeight, imp32Width, imp16Height, imp32Width)
+    for (let i=0; i<sizes.length; i+=2) {
+        for (let item of lithoSheets[colour]) {
+            if (sizes[i] <= item["height"] && sizes[i+1] <= item["width"]) {
+                let imp = [32, 24, 32, 16]
+                let numUp = [2,2,1,1]
+                textNumUp = numUp[i/2]
+                finalExtent = extent%8 === 0 ? extent : parseInt(extent) + (8-(extent%8))
+                let extras = finalExtent% imp[i/2] !== 0 ? (finalExtent%imp[i/2])/8 : 0
+                oddment16 = extras === 3 || extras === 2 ? true : false
+                oddment8 = extras === 3 || extras === 1 ? true : false
+                return value === "imp" ? imp [i/2]
+                : value === "numUp" ? numUp[i/2]
+                : value === "partTitle" ? `Text-${imp[i/2]}pp`
+                : value === "sheetSize" ? `${item["height"]}mm x ${item["width"]}mm`
+                : value === "sigBreakdown" && extras === 3 ? `${finalExtent}pp - ${(Math.floor(finalExtent/(imp[i/2])))-1}x${imp[i/2]}pp, 1x16pp, 1x8pp, 1x${imp[i/2]}pp`
+                : value === "sigBreakdown" && extras === 2 ? `${finalExtent}pp - ${(Math.floor(finalExtent/(imp[i/2])))-1}x${imp[i/2]}pp, 1x16pp, 1x${imp[i/2]}pp`
+                : value === "sigBreakdown" && extras === 1 ? `${finalExtent}pp - ${(Math.floor(finalExtent/(imp[i/2])))-1}x${imp[i/2]}pp, 1x8pp, 1x${imp[i/2]}pp`
+                : value === "sigBreakdown" ? `${finalExtent}pp - ${finalExtent/(imp[i/2])}x${imp[i/2]}pp`
+                : value === "oddment16NumUp" && imp[i/2] === 24 ? 3
+                : value === "oddment8NumUp" && imp[i/2] === 24 ? 6
+                : value === "oddment16NumUp" ? 2*textNumUp
+                : value === "oddment8NumUp" ? 4*textNumUp
+                : notApplicable
+            }
+        }
+    }
+}
+let textNumUp;
+let finalValues = []
 
 document.querySelector("#submit").addEventListener("click", ()=> {
     document.querySelector(".append-results").innerHTML = ""
-    //Gather Results
     printOption = document.querySelector("#print-method").value
     bindOption = document.querySelector("#bind-method").value
     caseOption = document.querySelector("#case-style").value
-    if (document.querySelector("#plates").value === "yes") {
-        plates = document.querySelector("#plate-extent").value
-        platePaper = document.querySelector("#plate-paper").value
-        plateGrammage = document.querySelector("#plate-grammage").value
-    } else {
-        plates = 0
-        platePaper = false;
-        plateGrammage = false;
-    }
+    plates = document.querySelector("#plates").value === "yes" ? document.querySelector("#plate-extent").value : 0
+    platePaper = document.querySelector("#plates").value === "yes" ? document.querySelector("#plate-paper").value : false;
+    plateGrammage = document.querySelector("#plates").value === "yes" ? document.querySelector("#plate-grammage").value : false;
     jacket = document.querySelector("#jackets").value
     spineStyle = document.querySelector("#spine-style").value
     greyboardThickness = document.querySelector("#greyboard").value
@@ -603,30 +532,26 @@ document.querySelector("#submit").addEventListener("click", ()=> {
     paper = document.querySelector("#paper-type").value
     grammage = document.querySelector("#grammage").value
     pantone = document.querySelector("#pantone").checked
-    if (pantone) {
-        pantoneCoverage = document.querySelector("#pantone-coverage").value
-    }
+    pantoneCoverage = pantone ? document.querySelector("#pantone-coverage").value : 0
     textPantone = document.querySelector("#text-pantone").checked
-    if (pantone) {
-        textPantoneCoverage = document.querySelector("#text-pantone-coverage").value
-    }
+    textPantoneCoverage = textPantone ? document.querySelector("#text-pantone-coverage").value : 0
     foilFront = document.querySelector("#foil-front").checked
-    if (foilFront) {
-        foilFrontCoverage = document.querySelector("#foil-front-measurement").value
-    }
+    foilFrontCoverage = foilFront ? document.querySelector("#foil-front-measurement").value : 0
     foilBack = document.querySelector("#foil-back").checked
-    if (foilBack) {
-        foilBackCoverage = document.querySelector("#foil-back-measurement").value
-    }
+    foilBackCoverage = foilBack ? document.querySelector("#foil-back-measurement").value : 0
     spotUV = document.querySelector("#spot-uv").checked
-    if (spotUV) {
-        spotUVBleeds = document.querySelector("#spot-uv-bleeds").value
-    }
+    spotUVBleeds = spotUV ? document.querySelector("#spot-uv-bleeds").value : false
     softTouch = document.querySelector("#soft-touch").checked
     headTail = document.querySelector("#head-tail").checked
     emboss = document.querySelector("#emboss").checked
     ribbon = document.querySelector("#ribbon").checked 
 
+    
+    for (let item of document.querySelectorAll(".input-field")) {
+        finalValues.push(item.value)
+    }
+    
+    
     createResult("Jacket")
     addEvents("Jacket", options["Jacket"].sheets)
     revertOptions("Jacket")
@@ -644,6 +569,13 @@ document.querySelector("#submit").addEventListener("click", ()=> {
     createResult("Greyboard")
     createResult("Endpapers")
     addEvents("Endpapers", options["Endpapers"].sheets)
+    createResult("Text-Litho")
+    if (oddment16=== true) {
+        createResult("Oddment-16")
+    }
+    if (oddment8 === true) {
+        createResult("Oddment-8")
+    }
 })
 
 let revertOptions = (part)=> {
