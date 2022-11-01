@@ -157,7 +157,7 @@ let createNewOption = (arr, newParent, originalHTML, needsIterating, firstElemen
 document.querySelector("#print-method").addEventListener("change", (e)=> {
     createNewOption(bindOptions[document.querySelector("#print-method").value], "#bind-method", "Bind Method", false, false, false)
     createNewOption(paperOptions[document.querySelector("#print-method").value], "#paper-type", "Paper Type", true, true, false)
-    document.querySelector("#print-method").value==="litho" ? document.querySelector(".text-pantone").classList.remove("text-pantone-hidden") : document.querySelector(".text-pantone").classList.add("text-pantone-hidden")
+    document.querySelector("#print-method").value==="litho" ? document.querySelector(".text-pantone").classList.remove("hidden") : document.querySelector(".text-pantone").classList.add("hidden")
 })
 
 //Select Paper type- Update Options for Grammage
@@ -189,6 +189,7 @@ document.querySelector("#case-style").addEventListener("click", (e)=> {
     document.querySelector(".plate-extent").style.display = plateValue
     document.querySelector(".cased-options").style.display = caseOptionValue
     document.querySelector("#jackets").value = jacketValue
+    document.querySelector("#case-style").value==="fourPage" || document.querySelector("#case-style").value==="eightPage" ? document.querySelector(".twoPageEndpapers").classList.remove("hidden") : document.querySelector(".twoPageEndpapers").classList.add("hidden")
 })
 
 
@@ -233,6 +234,7 @@ let options = {
         sheetSize: function () {return sheetCalc("Jacket", this.press())},
         numUp: function () { 
             return this.press() === "Ricoh 9200" ? 1
+            : this.press() === "KBA 3" && finalValues.softTouch ? "Seek Advice"
             : this.press() === "KBA 3" && !finalValues.spotUV ? 3
             : this.press() === "KBA 3" && finalValues.spotUV ? 2
             : notApplicable 
@@ -291,6 +293,7 @@ let options = {
         sheetSize: function () {return sheetCalc("PPC", this.press())},
         numUp: function() {
             return this.press() === "Ricoh 9200" ? 1
+            : this.press() === "KBA 3" && finalValues.softTouch ? "Seek Advice"
             : this.press() === "KBA 3" && finalValues.spotUV && parseInt(finalValues.trimHeight)<=234 && parseInt(finalValues.trimWidth)<=156 && this.sheetSize()==="640 x 900" ? 2
             : this.press() === "KBA 3" && parseInt(finalValues.trimHeight)<=234 && parseInt(finalValues.trimWidth)<=156 ? 3
             : this.press() === "KBA 3" ? "Seek Advice"
@@ -315,6 +318,7 @@ let options = {
         sheetSize: function () {return sheetCalc("eightPage", this.press())},
         numUp: function () {
             return this.press()==="Ricoh 9200" ? 1
+            : this.press() === "KBA 3" && finalValues.softTouch ? "Seek Advice"
             : this.press() === "KBA 3" && parseInt(finalValues.trimHeight)<=234 && parseInt(finalValues.trimWidth)<=156 && this.sheetSize()==="720 x 1020" ? 4
             : this.press() === "KBA 3" && parseInt(finalValues.trimHeight)<=234 && parseInt(finalValues.trimWidth)<=156 && this.sheetSize()=== "640 x 900" ? 3
             : this.press() === "KBA 3" && this.sheetSize() ==="720 x 1020" ? 3
@@ -340,6 +344,7 @@ let options = {
         sheetSize: function () {return sheetCalc("fourPage", this.press())},
         numUp: function () {
             return this.press()==="Ricoh 9200" || this.press() === "Ricoh 9210" ? 1
+            : this.press() === "KBA 3" && finalValues.softTouch ? "Seek Advice"
             : this.press() === "KBA 3" && !finalValues.spotUV && parseInt(finalValues.trimHeight)<=234 && parseInt(finalValues.trimWidth)<=156 ? 8
             : this.press() === "KBA 3" && !finalValues.spotUV ? 4
             : this.press() === "KBA 3" && this.sheetSize()=== "720 x 1020" ? 4
@@ -407,7 +412,10 @@ let options = {
     "Text-Litho" : {
         part: function() {return lithoCalc("partTitle")},
         press: function () {return finalValues.colour === "mono" && !finalValues.textPantone ? "KBA 1" : "KBA 3"},
-        ink: function() {return finalValues.colour === "mono" && !finalValues.textPantone ? "1/1" : finalValues.colour === "mono" ? "2/2" : "4/4"},
+        ink: function() {return finalValues.colour === "mono" && !finalValues.textPantone ? "1/1" 
+        : finalValues.colour === "mono" && finalValues.textPantone ? "2/2" 
+        : finalValues.textPantone ? "5/5"
+        : "4/4"},
         size: function() {return `${finalValues.trimHeight}mm x ${finalValues.trimWidth}mm`},
         spine: function() {return notApplicable},
         sheetSize: function () {return lithoCalc("sheetSize")},
@@ -450,13 +458,12 @@ let options = {
         size: function() {return `${finalValues.trimHeight}mm x ${finalValues.trimWidth}mm`},
         spine: function() {return notApplicable},
         sheetSize: function () {
+            fourson480 = finalValues.trimWidth > 185 && finalValues.trimWidth <=224 ? true : false
             return finalValues.trimWidth <=117 ? "402 reel"
             : finalValues.trimWidth <=143 ? "480 reel"
             : finalValues.trimWidth <=156 ? "503 reel"
             : finalValues.trimWidth <=185 ? "402 reel"
-            : finalValues.trimWidth <=224 ? ()=>{
-                fourson480 = true
-                return "480 reel"}
+            : finalValues.trimWidth <=224 ? "480 reel"
             : finalValues.trimWidth <=235 ? "503 reel"
             : "Seek Advice"
         },
@@ -543,8 +550,9 @@ let lithoCalc = (value) => {
     let heightBleeds = parseInt(finalValues.trimHeight)+6
     let widthBleeds = parseInt(finalValues.trimWidth)+3
     sizes.push(heightBleeds*4, widthBleeds*8, heightBleeds*4, widthBleeds*6, heightBleeds*4, widthBleeds*4, heightBleeds*2, widthBleeds*4)
+    let sheetOptions = finalValues.textPantone || finalValues.colour==="colour" ? "colour" : "mono"
     for (let i=0; i<sizes.length; i+=2) {
-        for (let item of lithoSheets[finalValues.colour]) {
+        for (let item of lithoSheets[sheetOptions]) {
             if (sizes[i] <= item["height"] && sizes[i+1] <= item["width"]) {
                 let imp = [32, 24, 32, 16]
                 let numUp = [2,2,1,1]
@@ -699,6 +707,8 @@ let addToggle = (arr)=> {
 
 }
 
+//BOX CALCULATOR?
+//INK CALCULATOR?
 //ADD FOURS ON 480 REEL 
 //OUTWORK 8PP FOLDING
 //SAPC OUTWORK PRICING
