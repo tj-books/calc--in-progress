@@ -129,6 +129,7 @@ p {
 }
 .added-info p {
     font-size: 0.9rem;
+    line-height: 1.5rem;
 }
 
 .additional-options label {
@@ -156,7 +157,7 @@ p {
     opacity: 0.3;
 }
 
-.Toner-PPCadjust, .GreyBoardadjust, .Text-16ppadjust, .Text-32ppadjust, .Text-8ppadjust, .Greyboardadjust {
+.Toner-PPCadjust, .GreyBoardadjust, .Text-16ppadjust, .Text-32ppadjust, .Text-8ppadjust, .Greyboardadjust, .Text-Lithoadjust, .Oddment-16adjust, .Oddment-8adjust, .Text-Digitaladjust, .Text-IX, .Text-Plate {
     display: none;
 }
 
