@@ -207,36 +207,18 @@
                             <div class="col-md-6">
                                 <div class="row">
                                     <div class="col-6">
-                                        <label for="foil-front">Foil-Front</label>
-                                    </div>
-                                    <div class="col-1">
-                                        <input type="checkbox" name="foilFront" id="foil-front" class="checkbox-field">
-                                    </div>
-                                    <div class="col-5">
-                                        <input id="foil-front-measurement" name="foilFrontCoverage" class="hidden form-control form-control-sm input-field" type="number" placeholder="Artwork Width">
-                                    </div>
-                                </div>  
-                            </div>
-                            <div class="col-md-6">
-                                <div class="row">
-                                    <div class="col-8">
                                         <label for="emboss">Emboss/Deboss</label>
                                     </div>
                                     <div class="col-1">
                                         <input type="checkbox" name="emboss" id="emboss" class="checkbox-field">
                                     </div>
-                                </div>  
-                            </div>
-                            <div class="col-md-6">
-                                <div class="row">
-                                    <div class="col-6">
-                                        <label for="foil-back">Foil-Back</label>
-                                    </div>
-                                    <div class="col-1">
-                                        <input type="checkbox" name="foilBack" id="foil-back" class="checkbox-field">
-                                    </div>
                                     <div class="col-5">
-                                        <input id="foil-back-measurement" name="foilBackCoverage" class="hidden form-control form-control-sm input-field" type="number" placeholder="Artwork Width">
+                                        <select name="embossArea" id="embossArea" class="hidden form-select form-select-sm input-field">
+                                            <option selected value="front">Front Only</option>
+                                            <option value="frontSpine">Front And Spine</option>
+                                            <option value="frontSpineBack">Front, Spine And Back</option>
+                                            <option value="frontSpineBackFlaps">Front, Spine, Back And Flaps</option>
+                                        </select>
                                     </div>
                                 </div>  
                             </div>
@@ -246,7 +228,7 @@
                                         <label for="head-tail">Head & Tail Bands</label>
                                     </div>
                                     <div class="col-1">
-                                        <input type="checkbox" name="headTail" id="head-tail" class="checkbox-field">
+                                        <input disabled type="checkbox" name="headTail" id="head-tail" class="checkbox-field">
                                     </div>
                                 </div>  
                             </div>
@@ -272,34 +254,47 @@
                                         <label for="ribbon">Ribbon Markers</label>
                                     </div>
                                     <div class="col-1">
-                                        <input type="checkbox" name="ribbon" id="ribbon" class="checkbox-field">
+                                        <input disabled type="checkbox" name="ribbon" id="ribbon" class="checkbox-field">
                                     </div>
                                 </div>  
                             </div>
                             <div class="col-md-6">
-                                <div class="row text-pantone text-pantone-hidden">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label for="foil">Extra Foiling</label>
+                                    </div>
+                                    <div class="col-1">
+                                        <input type="checkbox" name="foil" id="foil" class="checkbox-field">
+                                    </div>
+                                    <div class="foilingOptions col-5">
+                                    </div>
+                                </div>  
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row twoPageEndpapers">
+                                    <div class="col-8">
+                                        <label for="twoPageEndPapers">2pp Endpapers</label>
+                                    </div>
+                                    <div class="col-1">
+                                        <input disabled type="checkbox" name="twoPageEndpapers" id="twoPageEndPapers" class="checkbox-field">
+                                    </div>
+                                </div>  
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row text-pantone mt-1">
                                     <div class="col-6">
                                         <label for="text-pantone">Pantone Text</label>
                                     </div>
                                     <div class="col-1">
-                                        <input type="checkbox" name="textPantone" id="text-pantone" class="checkbox-field">
+                                        <input disabled type="checkbox" name="textPantone" id="text-pantone" class="checkbox-field">
                                     </div>
                                     <div class="col-5">
                                         <input id="text-pantone-coverage" name="textPantoneCoverage" class="hidden form-control form-control-sm input-field" type="number" placeholder="% Coverage">
                                     </div>
                                 </div>  
                             </div>
-                            <div class="col-md-6">
-                                <div class="row">
-                                    <div class="col-8">
-                                        <label for="twoPageEndPapers">2pp Endpapers</label>
-                                    </div>
-                                    <div class="col-1">
-                                        <input type="checkbox" name="twoPageEndpapers" id="twoPageEndPapers" class="checkbox-field">
-                                    </div>
-                                </div>  
-                            </div>
-
+                            
+                            
 
                         </div>
                         
