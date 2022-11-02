@@ -119,8 +119,8 @@ let showMore = (objectSelected, inputArea)=> {
 showMore("#pantone", "#pantone-coverage")
 showMore("#spot-uv", "#spot-uv-bleeds")
 showMore("#text-pantone", "#text-pantone-coverage")
-showMore("#foil-front", "#foil-front-measurement")
-showMore("#foil-back", "#foil-back-measurement")
+showMore("#foil", "#foil-coverage")
+showMore("#emboss", "#embossArea")
 
 let createNewOption = (arr, newParent, originalHTML, needsIterating, firstElement, selectedPaper)=> {
     if (!document.querySelector(`${newParent}`)) {
@@ -157,7 +157,7 @@ let createNewOption = (arr, newParent, originalHTML, needsIterating, firstElemen
 document.querySelector("#print-method").addEventListener("change", (e)=> {
     createNewOption(bindOptions[document.querySelector("#print-method").value], "#bind-method", "Bind Method", false, false, false)
     createNewOption(paperOptions[document.querySelector("#print-method").value], "#paper-type", "Paper Type", true, true, false)
-    document.querySelector("#print-method").value==="litho" ? document.querySelector(".text-pantone").classList.remove("hidden") : document.querySelector(".text-pantone").classList.add("hidden")
+    document.querySelector("#text-pantone").disabled = document.querySelector("#print-method").value==="litho" ? false : true 
 })
 
 //Select Paper type- Update Options for Grammage
@@ -189,7 +189,20 @@ document.querySelector("#case-style").addEventListener("click", (e)=> {
     document.querySelector(".plate-extent").style.display = plateValue
     document.querySelector(".cased-options").style.display = caseOptionValue
     document.querySelector("#jackets").value = jacketValue
-    document.querySelector("#case-style").value==="fourPage" || document.querySelector("#case-style").value==="eightPage" ? document.querySelector(".twoPageEndpapers").classList.remove("hidden") : document.querySelector(".twoPageEndpapers").classList.add("hidden")
+    document.querySelector("#ribbon").disabled = value==="fourPage" || value==="eightPage" || value === "none" ? true: false
+    document.querySelector("#head-tail").disabled = value==="fourPage" || value==="eightPage" || value === "none" ? true: false
+    document.querySelector("#twoPageEndPapers").disabled =  value==="Cloth" || value==="PPC" || value==="none" ? true: false  
+    document.querySelector("#twoPageEndPapers").checked = false;
+    document.querySelector("#head-tail").checked = false;
+    document.querySelector("#ribbon").checked = false;
+    document.querySelector(".foilingOptions").innerHTML = value==="none" ? "" 
+    : value === "Cloth" ? `<input id="foil-coverage" name="foilCoverage" class="hidden form-control form-control-sm input-field" type="number" placeholder="Artwork Width"></input>`
+    : `<select name="foilCoverage" id="foil-coverage" class="hidden form-select form-select-sm input-field">
+            <option selected value="front">Front Only</option>
+            <option value="frontSpine">Front And Spine</option>
+            <option value="frontSpineBack">Front, Spine And Back</option>
+            <option value="frontSpineBackFlaps">Front, Spine, Back And Flaps</option>
+        </select>`
 })
 
 
@@ -207,7 +220,7 @@ let sheetCalc = (part, press)=> {
 } 
 
 let checkCoverPress = (maxQty) => {
-    return finalValues.spotUV && finalValues.spotUVBleeds === "with-bleeds" || finalValues.foilFront && finalValues.caseOption !== "Cloth" || finalValues.foilBack && finalValues.caseOption !== "Cloth" || finalValues.emboss ? "Outwork" 
+    return finalValues.spotUV && finalValues.spotUVBleeds === "with-bleeds" || finalValues.foil && finalValues.caseOption !== "Cloth" || finalValues.emboss ? "Outwork" 
     : finalValues.pantone || finalValues.quantity >= maxQty ? "KBA 3"
     : finalValues.caseOption === "fourPage" && finalValues.printMethod === "digital" && !finalValues.spotUV ? "Ricoh 9210"
     : "Ricoh 9200"
@@ -228,7 +241,9 @@ let options = {
         sheets: ["720 x 1020", "640 x 900"],
         part: function () {return "Jacket"},
         press: function () {return checkCoverPress(3001)},   
-        ink: function () {return finalValues.pantone ? "5/0" : "4/0"},
+        ink: function () {return this.press()==="Outwork" && finalValues.pantone ? `5/0 </p><i class="fa-solid fa-circle-plus inkadjust mb-3 ms-3"></i>` 
+        : this.press()==="Outwork" ? `4/0 </p><i class="fa-solid fa-circle-plus inkadjust mb-3 ms-3"></i>`
+        : finalValues.pantone ? "5/0" : "4/0"},
         spine: function () {return calcSpineWidth()},
         size: function () {return `${parseInt(finalValues.trimHeight) + 18}mm x ${(finalValues.trimWidth*2)+ this.spine() +192}mm`},
         sheetSize: function () {return sheetCalc("Jacket", this.press())},
@@ -244,7 +259,9 @@ let options = {
             : this.press() === "Ricoh 9200" ? calculateCoverNumSheets(1.085, 2, this.numUp())
             : notApplicable
         },
-        extras: function () {return ""},
+        extras: function () {return this.press()==="Outwork" && finalValues.pantone ? ` £${Math.floor(100* calcSAPCPrice("Jacket", "5/0"))/100}`
+        : this.press()==="Outwork" ? `£${Math.floor(100* calcSAPCPrice("Jacket", "4/0"))/100}`
+        : ""},
         extrasInfo: function () {return ""},
         info: function () {return ""},
     },
@@ -267,18 +284,15 @@ let options = {
         extras: function () {return ""},
         extrasInfo: function () {return ""},
         info: function () {
-            let additionalInfo = `Foil Spine: ${Math.round(calcSpineWidth()*(finalValues.quantity*1.05)*1.1/1000)}m <br>`
-            if (finalValues.foilFront) {
-                additionalInfo += finalValues.foilFrontCoverage > 0 ? `Foil Front: ${Math.round(finalValues.foilFrontCoverage*(finalValues.quantity*1.05)*1.1/1000)}m <br>` : ""
-            }
-            if (finalValues.foilBack) {
-                additionalInfo += finalValues.foilBackCoverage > 0 ? `Foil Back: ${Math.round(finalValues.foilBackCoverage*(finalValues.quantity*1.05)*1.1/1000)}m <br>` : ""
+            let additionalInfo = `Foil (Spine Only): ${Math.round(calcSpineWidth()*(finalValues.quantity*1.05)*1.1/1000)}m <br>`
+            if (finalValues.foil) {
+                additionalInfo = `Foil: ${Math.round(finalValues.foilCoverage*(finalValues.quantity*1.05)*1.1/1000)}m <br>`
             } 
             if (finalValues.headTail) {
                 additionalInfo += `Head and Tail Bands: ${Math.round(calcSpineWidth()*2*(finalValues.quantity*1.05)*1.1/1000)}m <br>`
             }
             if (finalValues.ribbon) {
-                additionalInfo += `Ribbon: ${Math.round(parseInt(finalValues.trimHeight)+150*(finalValues.quantity*1.05)*1.1/1000)}m <br>`
+                additionalInfo += `Ribbon: ${Math.round(parseInt(finalValues.trimHeight)+150*(finalValues.quantity*1.05)/1000)}m <br>`
             }
             return additionalInfo
         },
@@ -287,7 +301,9 @@ let options = {
         sheets: ["720 x 1020", "640 x 900"],
         part: function () {return "PPC"},
         press: function () {return checkCoverPress(6001)},
-        ink: function () {return finalValues.pantone ? "5/0" : "4/0"},
+        ink: function () {return this.press()==="Outwork" && finalValues.pantone ? `5/0 </p><i class="fa-solid fa-circle-plus inkadjust mb-3 ms-3"></i>` 
+        : this.press()==="Outwork" ? `4/0 </p><i class="fa-solid fa-circle-plus inkadjust mb-3 ms-3"></i>`
+        : finalValues.pantone ? "5/0" : "4/0"},
         spine: function () {return calcSpineWidth()},
         size: function () {return `${parseInt(finalValues.trimHeight) + 38}mm x ${(finalValues.trimWidth*2)+this.spine()+parseInt(finalValues.spineStyle)+40}mm`},
         sheetSize: function () {return sheetCalc("PPC", this.press())},
@@ -304,15 +320,28 @@ let options = {
             : this.press() === "Ricoh 9200" ? calculateCoverNumSheets(1.25, 2, this.numUp())
             : notApplicable
         },
-        extras: function () {return ""},
+        extras: function () {return this.press()==="Outwork" && finalValues.pantone ? `£${Math.floor(100* calcSAPCPrice("PPC", "5/0"))/100}` 
+        : this.press()==="Outwork" ? `£${Math.floor(100* calcSAPCPrice("PPC", "4/0"))/100}`
+        : ""},
         extrasInfo: function () {return ""},
-        info: function () {return ""},
+        info: function () {
+            let additionalInfo = ""
+            if (finalValues.headTail) {
+                additionalInfo += `Head and Tail Bands: ${Math.round(calcSpineWidth()*2*(finalValues.quantity*1.05)*1.1/1000)}m <br>`
+            }
+            if (finalValues.ribbon) {
+                additionalInfo += `Ribbon: ${Math.round(parseInt(finalValues.trimHeight)+150*(finalValues.quantity*1.05)*1.1/1000)}m <br>`
+            }
+            return additionalInfo
+        },
     }, 
     "eightPage": {
         sheets: ["720 x 1020", "640 x 900"],
         part: function () {return "8pp Cover"},
         press: function () {return checkCoverPress(4001)},
-        ink: function () {return finalValues.pantone ? "5/0" : "4/0"},
+        ink: function () {return this.press()==="Outwork" && finalValues.pantone ? `5/0 </p><i class="fa-solid fa-circle-plus inkadjust mb-3 ms-3"></i>` 
+        : this.press()==="Outwork" ? `4/0 </p><i class="fa-solid fa-circle-plus inkadjust mb-3 ms-3"></i>`
+        : finalValues.pantone ? "5/0" : "4/0"},
         spine: function () {return calcSpineWidth()},
         size: function () {return `${parseInt(finalValues.trimHeight)+20}mm x ${(finalValues.trimWidth*2)+this.spine()+209}mm`},
         sheetSize: function () {return sheetCalc("eightPage", this.press())},
@@ -330,7 +359,9 @@ let options = {
             : this.press() === "Ricoh 9200" ? calculateCoverNumSheets(1.15, 2, this.numUp())
             : notApplicable
         },
-        extras: function () {return ""},
+        extras: function () {return this.press()==="Outwork" && finalValues.pantone ? `£${Math.floor(100* calcSAPCPrice("eightPage", "5/0"))/100}` 
+        : this.press()==="Outwork" ? `£${Math.floor(100* calcSAPCPrice("eightPage", "4/0"))/100}`
+        : ""},
         extrasInfo: function () {return ""},
         info: function () {return ""},
     },
@@ -338,7 +369,9 @@ let options = {
         sheets: ["720 x 1020", "640 x 900"],
         part: function () {return "4pp Cover"},
         press: function () {return checkCoverPress(7001)},
-        ink: function () {return finalValues.pantone ? "5/0" : "4/0"},
+        ink: function () {return this.press()==="Outwork" && finalValues.pantone ? `5/0 </p><i class="fa-solid fa-circle-plus inkadjust mb-3 ms-3"></i>` 
+            : this.press()==="Outwork" ? `4/0 </p><i class="fa-solid fa-circle-plus inkadjust mb-3 ms-3"></i>`
+            : finalValues.pantone ? "5/0" : "4/0"},
         spine: function () {return calcSpineWidth()},
         size: function () {return `${parseInt(finalValues.trimHeight)+20}mm x ${(finalValues.trimWidth*2)+this.spine()+9}mm`},
         sheetSize: function () {return sheetCalc("fourPage", this.press())},
@@ -356,7 +389,9 @@ let options = {
             : this.press() === "Ricoh 9200" || this.press()=== "Ricoh 9210" ? calculateCoverNumSheets(1.1,2,this.numUp())
             : notApplicable
         },
-        extras: function () {return ""},
+        extras: function () {return this.press()==="Outwork" && finalValues.pantone ? `£${Math.floor(100* calcSAPCPrice("fourPage", "5/0"))/100}` 
+        : this.press()==="Outwork" ? `£${Math.floor(100* calcSAPCPrice("fourPage", "4/0"))/100}`
+        : ""},
         extrasInfo: function () {return ""},
         info: function () {return ""},
     },
@@ -409,6 +444,26 @@ let options = {
         extrasInfo: function () {return ""},
         info:function () {return ""}
     },
+    "Endpapers-2pp" : {
+        sheets: ["640 x 970", "1020 x 760"],
+        part: function () {return "Endpapers-2pp"},
+        press: function () {return notApplicable},
+        ink: function () {return notApplicable},
+        spine: function () {return notApplicable},
+        size: function () {return `${parseInt(finalValues.trimHeight)+6}mm x ${(finalValues.trimWidth)+3}mm`},
+        sheetSize: function () {return "640 x 970"},
+        numUp: function () { 
+            let endPaperHeight = this.sheetSize() === "640 x 970" ? 970 : 760
+            let endPaperWidth = this.sheetSize() === "640 x 970" ? 640 : 1020
+          return Math.floor((endPaperHeight/(parseInt(finalValues.trimHeight)+6)))*Math.floor((endPaperWidth/(parseInt(finalValues.trimWidth)+3)))
+        },
+        numSheets: function () { 
+            return Math.round((finalValues.quantity/this.numUp())*2*1.1)
+        },
+        extras: function () {""},
+        extrasInfo: function () {return ""},
+        info:function () {return ""}
+    },
     "Text-Litho" : {
         part: function() {return lithoCalc("partTitle")},
         press: function () {return finalValues.colour === "mono" && !finalValues.textPantone ? "KBA 1" : "KBA 3"},
@@ -420,9 +475,9 @@ let options = {
         spine: function() {return notApplicable},
         sheetSize: function () {return lithoCalc("sheetSize")},
         numUp: function() {return lithoCalc("numUp")},
-        numSheets: function() {return "Add Calc"},
-        extras: function() {return lithoCalc("sigBreakdown")},
-        extrasInfo: function() {return ""},
+        numSheets: function() {return this.press()==="KBA 1" ? Math.round((finalValues.quantity * 1.04 * Math.floor(finalExtent/impositionLitho) + 150)/this.numUp()) : Math.round((finalValues.quantity * 1.1 * Math.floor(finalExtent/impositionLitho) + 150)/this.numUp()) },
+        extras: function() {return `${finalExtent}pp`},
+        extrasInfo: function() {return lithoCalc("sigBreakdown")},
         info: function() {return ""}                 
     },
     "Oddment-16": {
@@ -433,9 +488,9 @@ let options = {
         spine: function() {return notApplicable},
         sheetSize: function () {return options["Text-Litho"].sheetSize()},
         numUp: function () {return options["Text-Litho"].part() === "Text-24pp" ? 3 : (options["Text-Litho"].numUp())*2},
-        numSheets: function() {return "Add Calc"},
-        extras: function() {return "1x16pp"},
-        extrasInfo: function() {return ""},
+        numSheets: function() {return this.press()==="KBA 1" ? Math.round((finalValues.quantity * 1.04 + 150)/this.numUp()) : Math.round((finalValues.quantity * 1.1 * Math.floor(finalExtent/impositionLitho) + 150)/this.numUp()) },
+        extras: function() {return ""},
+        extrasInfo: function() {return "1x16pp"},
         info: function (){return ""},
     },
     "Oddment-8": {
@@ -446,22 +501,23 @@ let options = {
         spine: function() {return notApplicable},
         sheetSize: function () {return options["Text-Litho"].sheetSize()},
         numUp: function () {return options["Text-Litho"].part() === "Text-24pp" ? 6 : (options["Text-Litho"].numUp())*4},
-        numSheets: function() {return "Add Calc"},
-        extras: function() {return "1x8pp"},
-        extrasInfo: function() {return ""},
+        numSheets: function() {return this.press()==="KBA 1" ? Math.round((finalValues.quantity * 1.04 + 150)/this.numUp()) : Math.round((finalValues.quantity * 1.1 * Math.floor(finalExtent/impositionLitho) + 150)/this.numUp()) },
+        extras: function() {return ""},
+        extrasInfo: function() {return "1x8pp"},
         info: function (){return ""},
     },
     "Text-Digital" : {
-        part: function() {return finalValues.trimWidth <=156 ? "Text-6pp" : "Text-4pp"},
+        part: function() {return finalValues.paper === "TJ Matt" ? "Text-4pp"
+        :finalValues.trimWidth <=156 ? "Text-6pp" : "Text-4pp"},
         press: function () {return finalValues.colour === "mono" ? "Mono 8160" : "Colour 8160"},
         ink: function() {return finalValues.colour === "mono" ? "1/1" : "4/4"},
         size: function() {return `${finalValues.trimHeight}mm x ${finalValues.trimWidth}mm`},
         spine: function() {return notApplicable},
         sheetSize: function () {
             fourson480 = finalValues.trimWidth > 185 && finalValues.trimWidth <=224 ? true : false
-            return finalValues.trimWidth <=117 ? "402 reel"
-            : finalValues.trimWidth <=143 ? "480 reel"
-            : finalValues.trimWidth <=156 ? "503 reel"
+            return finalValues.trimWidth <=117 && finalValues.paper !== "TJ Matt" ? "402 reel"
+            : finalValues.trimWidth <=143 && finalValues.paper !== "TJ Matt" ? "480 reel"
+            : finalValues.trimWidth <=156 && finalValues.paper !== "TJ Matt" ? "503 reel"
             : finalValues.trimWidth <=185 ? "402 reel"
             : finalValues.trimWidth <=224 ? "480 reel"
             : finalValues.trimWidth <=235 ? "503 reel"
@@ -470,11 +526,12 @@ let options = {
         numUp: function() {return 1},
         numSheets: function() {return "Add Calc"},
         extras: function() {
-            let imposition = finalValues.trimWidth <=156 ? 6 : 4
+            let imposition = finalValues.paper === "TJ Matt"? 4 : finalValues.trimWidth <=156 ? 6 : 4
             finalExtent = finalValues.extent%imposition === 0 ? finalValues.extent : parseInt(finalValues.extent) + (imposition-(finalValues.extent%imposition))
-            return  `${finalExtent}pp - ${finalExtent/imposition}x${imposition}pp`
+            sigBreakdownDigital = `${finalExtent/imposition}x${imposition}pp`
+            return  `${finalExtent}pp`
             },
-        extrasInfo: function() {return ""},
+        extrasInfo: function() {return sigBreakdownDigital},
         info: function() {return ""}
     },
     "Text-IX" : {
@@ -536,6 +593,8 @@ let options = {
 
 let fourson480 = false;
 let impositionIX;
+let impositionLitho;
+let sigBreakdownDigital;
 let oddment16 = false;
 let oddment8 = false;
 
@@ -555,14 +614,15 @@ let lithoCalc = (value) => {
         for (let item of lithoSheets[sheetOptions]) {
             if (sizes[i] <= item["height"] && sizes[i+1] <= item["width"]) {
                 let imp = [32, 24, 32, 16]
+                impositionLitho = i === 0 ? 64 : i === 2 ? 48 : i === 3 ? 32 : 16
                 let numUp = [2,2,1,1]
                 finalExtent = finalValues.extent%8 === 0 ? finalValues.extent : parseInt(finalValues.extent) + (8-(finalValues.extent%8))
                 oddment16 = (finalExtent%imp[i/2])/8 === 3 || (finalExtent%imp[i/2])/8 === 2 ? true : false
                 oddment8 = (finalExtent%imp[i/2])/8 === 3 || (finalExtent%imp[i/2])/8 === 1 ? true : false
                 return value === "numUp" ? numUp[i/2]
                 : value === "partTitle" ? `Text-${imp[i/2]}pp`
-                : value === "sheetSize" ? `${item["height"]}mm x ${item["width"]}mm`
-                : value === "sigBreakdown" ? `${finalExtent}pp - ${(Math.floor(finalExtent/(imp[i/2])))}x${imp[i/2]}pp`
+                : value === "sheetSize" ? `${item["height"]} x ${item["width"]}`
+                : value === "sigBreakdown" ? `${(Math.floor(finalExtent/(imp[i/2])))}x${imp[i/2]}pp`
                 : notApplicable
             }
         }
@@ -586,9 +646,15 @@ document.querySelector("#submit").addEventListener("click", ()=> {
         createResult("Jacket")
         addEvents("Jacket", options["Jacket"].sheets)
         revertOptions("Jacket")
+        if (options["Jacket"].press()==="Outwork") {
+            recalculateSAPC("Jacket", outworkInk)
+        }
     }
     createResult(finalValues.caseOption)
     addEvents(finalValues.caseOption, options[finalValues.caseOption].sheets)
+    if (options[finalValues.caseOption].press()==="Outwork") {
+        recalculateSAPC(finalValues.caseOption, outworkInk)
+    }
     if (finalValues.caseOption !== "Cloth") {
         revertOptions(finalValues.caseOption)
     }
@@ -596,6 +662,9 @@ document.querySelector("#submit").addEventListener("click", ()=> {
         createResult("Greyboard")
         createResult("Endpapers")
         addEvents("Endpapers", options["Endpapers"].sheets)
+    } else if (finalValues.twoPageEndpapers) {
+        createResult("Endpapers-2pp")
+        addEvents("Endpapers-2pp", options["Endpapers-2pp"].sheets)
     }
     if (finalValues.printMethod==="litho") {
         createResult("Text-Litho")
@@ -613,7 +682,16 @@ document.querySelector("#submit").addEventListener("click", ()=> {
     if (finalValues.plates > 0) {
         createResult("Text-Plate")
     }
-    addToggle(items)
+    for (let item of items) {
+        if (document.querySelector(`.${item}-open`).classList.contains("hidden")) {
+            document.querySelector(`.${item}-open`).classList.remove("hidden")
+        }
+        if (options[item].info() === "") {
+            document.querySelector(`.${item}-open`).classList.add("hidden")
+        } else {
+            addToggle(item)
+        }
+    }
 })
 
 let revertOptions = (part)=> {
@@ -624,6 +702,23 @@ let revertOptions = (part)=> {
         document.querySelector(`.${part}NumUp`).innerHTML = options[part].numUp()
         document.querySelector(`.${part}NumSheets`).innerHTML = options[part].numSheets()
     }
+}
+
+let recalculateSAPC = (part, arr) => {
+    document.querySelector(".inkadjust").addEventListener("click", ()=> {
+        let currentIndex = arr.indexOf(document.querySelector(`.${part}ink`).innerHTML);
+        if (currentIndex+1 !== arr.length) {
+            document.querySelector(`.${part}ink`).innerHTML = arr[currentIndex+1]
+            options[part].extras = function () {return options[part].press()==="Outwork" ? `£${Math.floor(100 * calcSAPCPrice(part, arr[currentIndex+1]))/100}` : ""}
+            options[part].ink = function () {return options[part].press()==="Outwork" ? `${arr[currentIndex+1]} </p><i class="fa-solid fa-circle-plus inkadjust mb-3 ms-3"></i>` : finalValues.pantone ? "5/0" : "4/0"}
+            document.querySelector(`.${part}extras`).innerHTML = options[part].extras()
+        } else {
+            document.querySelector(`.${part}ink`).innerHTML = arr[0]
+            options[part].extras = function () {return options[part].press()==="Outwork" ? `£${Math.floor(100*calcSAPCPrice(part, arr[0]))/100}` : ""}
+            options[part].ink = function () {return options[part].press()==="Outwork" ? `${arr[0]} </p><i class="fa-solid fa-circle-plus inkadjust mb-3 ms-3"></i>` : finalValues.pantone ? "5/0" : "4/0"}
+            document.querySelector(`.${part}extras`).innerHTML = options[part].extras()
+        }
+    })
 }
 
 let addEvents = (part, arr)=> {
@@ -649,6 +744,65 @@ let addEvents = (part, arr)=> {
     })
 }
 
+let outworkInk = ["1/0", "2/0", "3/0", "4/0", "5/0"]
+let calcSAPCPrice = (value, ink) => {
+    let price = SAPCBasePrice[value][ink]
+    if (value === "fourPage" || value === "PPC") {
+        price += finalValues.softTouch ? (37/1000)*finalValues.quantity : 0
+        price += finalValues.foil && finalValues.foilCoverage === "front" ? 168.3 + (42/1000)*finalValues.quantity
+        : finalValues.foil && finalValues.foilCoverage === "frontSpine" ? 197 + (49/1000)*finalValues.quantity
+        : finalValues.foil && finalValues.foilCoverage === "frontSpineBack" ? 289.4 + (60/1000)*finalValues.quantity : 0
+        price += finalValues.spotUV ? 179.5 + (46/1000)*finalValues.quantity : 0
+        price += finalValues.emboss && finalValues.embossArea === "front" ? 172.4 + (37/1000)*finalValues.quantity
+        : finalValues.emboss && finalValues.embossArea === "frontSpine" ? 211.4 + (37/1000)*finalValues.quantity
+        : finalValues.emboss && finalValues.embossArea === "frontSpineBack" ? 289.4 + (37/1000)*finalValues.quantity : 0
+    } else if (value === "Jacket" || value === "eightPage") {
+        price += finalValues.softTouch ? (50/1000)*finalValues.quantity : 0
+        price += finalValues.foil && finalValues.foilCoverage === "front" ? 252 + (60/1000)*finalValues.quantity
+        : finalValues.foil && finalValues.foilCoverage === "frontSpine" ? 282 + (66/1000)*finalValues.quantity
+        : finalValues.foil && finalValues.foilCoverage === "frontSpineBack" ? 342 + (78/1000)*finalValues.quantity 
+        : finalValues.foil && finalValues.foilCoverage === "frontSpineBackFlaps" ? 414 + (90/1000)*finalValues.quantity : 0
+        price += finalValues.spotUV ? 179.5 + (46/1000)*finalValues.quantity : 0
+        price += finalValues.emboss && finalValues.embossArea === "front" ? 202 + (37/1000)*finalValues.quantity
+        : finalValues.emboss && finalValues.embossArea === "frontSpine" ? 241 + (37/1000)*finalValues.quantity
+        : finalValues.emboss && finalValues.embossArea === "frontSpineBack" ? 319 + (37/1000)*finalValues.quantity 
+        : finalValues.emboss && finalValues.embossArea === "frontSpineBackFlaps" ? 413 + (37/1000)*finalValues.quantity : 0
+    }
+    return price  
+
+}
+
+let SAPCBasePrice = {
+    "fourPage" : {
+        "1/0": 114.73,
+        "2/0": 169.78,
+        "3/0": 280.29,
+        "4/0": 114.69,
+        "5/0": 205.29
+    },
+    "eightPage" : {
+        "1/0": 155.03,
+        "2/0": 222.73,
+        "3/0": 290.62,
+        "4/0": 148.12,
+        "5/0": 215.62
+    },
+    "PPC" : {
+        "1/0": 101.81,
+        "2/0": 156.87,
+        "3/0": 267.41,
+        "4/0": 99.52,
+        "5/0": 192.41
+    },
+    "Jacket" : {
+        "1/0": 137.84,
+        "2/0": 205.53,
+        "3/0": 273.32,
+        "4/0": 130.82,
+        "5/0": 198.32
+    }
+}
+
 let items=[]
 //Create each Result row
 const createResult = (part)=> {
@@ -665,7 +819,7 @@ const createResult = (part)=> {
     <p>${options[part].press()}</p>
 </div>
 <div class="col col-lg-1">
-    <p>${options[part].ink()}</p>
+    <p class="${part}ink">${options[part].ink()}</p>
 </div>
 <div class="col col-lg-1">
 <p>${options[part].spine()}</p>
@@ -683,42 +837,33 @@ const createResult = (part)=> {
 <p class="${part}NumSheets">${options[part].numSheets()}</p>
 </div>
 <div class="col col-lg-1">
-<p class="${part}extras">${options[part].extras()}</p>
-<p>${options[part].extrasInfo()}</p>
+<p class="${part}extras ms-5">${options[part].extras()}</p>
 </div>
 <div class="col col-lg-1">
-<p><i class="fa-solid fa-circle-plus ${part}-open mt-2 ms-auto"></i></p>
+<p class="ms-auto">${options[part].extrasInfo()}</p>
+<p><i class="fa-solid fa-circle-plus ${part}-open mt-2 me-3"></i></p>
 </div>
 <div class="row no-display ${part}-hidden">
 <div class="added-info col-lg-11 ms-auto">
-<p class="me-auto"> ${options[part].info()}</p>
+<p class="me-auto ${part}info"> ${options[part].info()}</p>
 </div>
 </div>
     `
     document.querySelector(".append-results").appendChild(newElement)
 }
 
-let addToggle = (arr)=> {
-    for (let item of arr) {
+let addToggle = (item) => {
         document.querySelector(`.${item}-open`).addEventListener("click", ()=> {
-            document.querySelector(`.${item}-hidden`).classList.toggle("no-display")
-        })
-    }
-
+        document.querySelector(`.${item}-hidden`).classList.toggle("no-display")
+    })
 }
 
 //BOX CALCULATOR?
 //INK CALCULATOR?
-//ADD FOURS ON 480 REEL 
 //OUTWORK 8PP FOLDING
-//SAPC OUTWORK PRICING
-//QUANTITIES TO ORDER- FOIL, PMS, HEAD AND TAIL BANDS, CLOTH, RIBBON MARKERS, ENDPAPERS
-//ADD OPTIONS TO CHANGE
 //FLAP SIZE FOR JACKET AND FOR 8PP COVER
 //TEXT SIZE INCREASING FOR LITHO JOBS IF AN 8PP COVER
-//CHECK PAGINAITON OF PLATE SECTION
 //ADD OPTION TO SEE IF PLATES CAN FALL IN CERTAIN PLACE
-//ADD WHICH ENDPAPERS IF PLAIN
-//ADD STANDARD OR NON STANDARD FOR ENDPAPERS
-//CREATE OPTION FOR PRINTED ENDPAPERS
-//IMPLEMENT FUNCTIONALITY FOR TEXT PANTONE- ONLY APPEAR WHEN TEXT IS LITHO
+//SADDLE-STITCHED CAN ONLY BE 4PP COVER
+//ADD FORM VERIFICATION TO CHECK ALL ANSWERS ARE VALID
+//ADD PASSWORD FOR ACCESS
