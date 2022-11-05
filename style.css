@@ -37,7 +37,7 @@ h2 {
     margin-top: -3rem;
     height: 100vh;
     width: 100%;
-    display: flex;
+    display: none;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -150,11 +150,24 @@ p {
 }
 
 .results p {
-    font-size: 1rem;
+    font-size: 0.9rem;
 }
 
 .results div p {
     text-align: left;
+}
+
+.result-line {
+    position: relative;
+}
+.result-line::after {
+    content: "";
+    position: absolute;
+    height: 60%;
+    width: 0.05rem;
+    box-shadow: 0.1rem 0.1rem 0.1rem rgba(225,225,225,0.5);
+    right: 3%;
+    top: 20%;
 }
 
 .added-info {
@@ -187,7 +200,7 @@ p {
 }
 
 .n-a {
-    color: rgb(187, 185, 185);
+    color: rgb(241, 239, 239);
     opacity: 0.3;
 }
 
