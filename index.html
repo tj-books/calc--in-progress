@@ -15,12 +15,19 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@300&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+        <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.css" />
     <link href="style.css" rel="stylesheet">
     <title>Printing Calculator</title>
 </head>
 
 <body>
-    <div class="container-fluid form-container">
+    <div class="sign-in">
+        <h1 class="m-4">TJ Books Printing Calculator</h1>
+        <input class = "form-control form-control-lg m-3" type="text" id="name" placeholder="Username">
+        <input class="form-control form-control-lg m-3" type="password" id="password" placeholder="Password">
+        <button class="btn m-3" id="log-in-btn" onclick="login()">Submit</button>
+    </div>
+    <div class="container-fluid form-container calculator password-protected">
         <div class="row">
             <h2 class="mt-lg-5" id="title">TJ Books Printing Calculator</h2>
         </div>
@@ -32,7 +39,7 @@
                         <div class="col-lg-4 pt-2 mb-3">
                             <label for="print-method" class="col-form-label col-form-label-md">Print Method</label>
                             <select name="printMethod" required id="print-method" class="form-select form-select-lg input-field" aria-label="">
-                                <option selected value="no-print-method">Print Method</option>
+                                <option selected value="none">Print Method</option>
                                 <option value="litho"> Litho</option>
                                 <option value="digital"> Digital</option>
                                 <option value="IX"> IX</option>
@@ -42,14 +49,14 @@
                         <div class="col-lg-4 pt-2 mb-3">
                             <label for="bind-method" class="col-form-label col-form-label-md">Bind Method</label>
                             <select name="bindMethod" required id="bind-method" class="form-select form-select-lg input-field" aria-label="">
-                                <option selected disabled>Bind Method</option>
+                                <option value="none" selected disabled>Bind Method</option>
                             </select>
                         </div>
                         <!--Colour Select-->
                         <div class="col-lg-4 pt-2 mb-3">
                             <label for="colourSelect" class="col-form-label col-form-label-md">Text Colour</label>
-                            <select name="colour" required id="colourSelect" class="form-select form-select-lg input-field">
-                                <option selected disabled>Text Colour</option>
+                            <select name="colour" required id="colour-select" class="form-select form-select-lg input-field">
+                                <option value="none" selected disabled>Text Colour</option>
                                 <option value="mono">Mono</option>
                                 <option value="colour">Colour</option>
                             </select>
@@ -90,8 +97,8 @@
                         <div id="case-style-additional" class="col-lg-12">
                             <div class="plate-option row">
                                 <!--Plate Section Select-->
-                                <label for="plates" name="platesValue" class="col-form-label col-form-label-md input-field">Plates:</label>
-                                <select required id='plates' class='form-select form-select-lg'>
+                                <label for="plates" class="col-form-label col-form-label-md">Plates:</label>
+                                <select required id='plates' name="platesValue" class='form-select form-select-lg  input-field'>
                                     <option value='no' selected>No Plate Section</option>
                                     <option value='yes'> With Plate Section</option>
                                 </select>
@@ -104,13 +111,13 @@
                                         <!--Plate Paper Input-->
                                         <div class="col-lg-6">
                                             <select id='plate-paper' name="platePaper" class='mt-3 form-select form-select-lg input-field'>
-                                                <option selected disabled>Plate Paper Type</option>
+                                                <option value="none" selected disabled>Plate Paper Type</option>
                                             </select>
                                         </div>
                                         <!--Plate Grammage Input-->
                                         <div class="col-lg-3">
                                             <select id='plate-grammage' name="plateGrammage" class='mt-3 form-select form-select-lg input-field'>
-                                                <option selected disabled>Gsm</option>
+                                                <option value="none" selected disabled>Gsm</option>
                                             </select>
                                         </div>
                                     </div> 
@@ -153,14 +160,14 @@
                         <div class="col-lg-6 pt-2 mb-3">
                             <label for="paper-type" class="col-form-label col-form-label-md"> Paper Type:</label>
                             <select required id="paper-type" name="paper" class="form-select form-select-lg input-field" aria-label="">
-                                <option selected disabled>Paper Type</option>
+                                <option value="none" selected disabled>Paper Type</option>
                             </select>
                         </div>
                         <!--Paper Grammage Select-->
                         <div class="col-lg-3 pt-2 mb-3">
                             <label for="grammage" class="col-form-label col-form-label-md"> Grammage:</label>
                             <select required id="grammage" name="grammage" class="form-select form-select-lg input-field" aria-label="">
-                                <option selected disabled>Grammage</option>
+                                <option value="none" selected disabled>Grammage</option>
                             </select>
                         </div>
                         <!--Quantity Input-->
@@ -356,12 +363,16 @@
         </div>
     </div>
 
-</body>
 
-<script src="app.js"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
     crossorigin="anonymous"></script>
+    <script src="app.js"></script>
 </body>
 
 </html>
