@@ -10,7 +10,37 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth(); 
+
+firebase.auth().onAuthStateChanged((user) => {
+    if (!user) {
+            document.querySelector(".sign-in").style.display = "flex"
+            document.querySelector(".calculator").classList.add("password-protected")  
+      var uid = user.uid;
+    } else {
+        document.querySelector(".sign-in").style.display = "none"
+        document.querySelector(".calculator").classList.remove("password-protected")
+    }
+  });
+
 const login = () => {
+    let email = document.querySelector("#name").value
+    let password = document.querySelector("#password").value
+    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
+    .then(()=> {
+        firebase.auth().signInWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+    var user = userCredential.user;
+    })
+  })
+  .catch((error) => {
+    var errorCode = error.code;
+    var errorMessage = error.message;
+  });
+}
+
+
+
+/*const login = () => {
     let email = document.querySelector("#name").value
     let password = document.querySelector("#password").value
     firebase.auth().signInWithEmailAndPassword(email, password)
@@ -27,7 +57,7 @@ const login = () => {
     var errorMessage = error.message;
   });
 }
-
+*/
 
 
 
@@ -552,11 +582,12 @@ let options = {
             : "Seek Advice"
         },
         numUp: function() {return 1},
-        numSheets: function() {return "Add Calc"},
+        numSheets: function() {
+            calcDigital()
+            return `${((parseInt(finalValues.trimHeight)+12)/1000)* finalValues.quantity * sigs}m`},
         extras: function() {
-            let imposition = finalValues.paper === "TJ Matt"? 4 : finalValues.trimWidth <=156 ? 6 : 4
-            finalExtent = finalValues.extent%imposition === 0 ? finalValues.extent : parseInt(finalValues.extent) + (imposition-(finalValues.extent%imposition))
-            sigBreakdownDigital = `${finalExtent/imposition}x${imposition}pp`
+            calcDigital()
+            sigBreakdownDigital = `${sigs}x${impositionDigital}pp`
             return  `${finalExtent}pp`
             },
         extrasInfo: function() {return sigBreakdownDigital},
@@ -619,12 +650,20 @@ let options = {
     },
 }
 
+let sigs;
+let impositionDigital;
 let fourson480 = false;
 let impositionIX;
 let impositionLitho;
 let sigBreakdownDigital;
 let oddment16 = false;
 let oddment8 = false;
+
+let calcDigital = ()=> {
+    impositionDigital = finalValues.paper === "TJ Matt"? 4 : finalValues.trimWidth <=156 ? 6 : 4
+    finalExtent = finalValues.extent%impositionDigital === 0 ? finalValues.extent : parseInt(finalValues.extent) + (impositionDigital-(finalValues.extent%impositionDigital))
+    sigs = finalExtent/impositionDigital
+}
 
 let generateGreyboardSizes = (arr, newArr) => {
     for (let item of arr) {
@@ -879,28 +918,28 @@ const createResult = (part)=> {
     newElement.classList.add("results")
     newElement.classList.add("mt-3")
     newElement.innerHTML = `
-<div class="col col-lg-1">
+<div class="col col-lg-1 result-line">
 <p>${options[part].part()}</p>
 </div>
-<div class="col col-lg-1">
+<div class="col col-lg-1 result-line">
     <p>${options[part].press()}</p>
 </div>
-<div class="col col-lg-1">
+<div class="col col-lg-1 result-line">
     <p class="${part}ink">${options[part].ink()}</p>
 </div>
-<div class="col col-lg-1">
+<div class="col col-lg-1 result-line">
 <p>${options[part].spine()}</p>
 </div>
-<div class="col col-lg-2">
+<div class="col col-lg-2 result-line">
 <p>${options[part].size()}</p>
 </div>
-<div class="col col-lg-2">
+<div class="col col-lg-2 result-line">
 <p class="${part}sheet">${options[part].sheetSize()}</p><p></p><i class="fa-solid fa-circle-plus ${part}adjust mb-3 ms-3"></i></p>
 </div>
-<div class="col col-lg-1">
+<div class="col col-lg-1 result-line">
 <p class="${part}NumUp">${options[part].numUp()}</p>
 </div>
-<div class="col col-lg-1">
+<div class="col col-lg-1 result-line">
 <p class="${part}NumSheets">${options[part].numSheets()}</p>
 </div>
 <div class="col col-lg-1">
