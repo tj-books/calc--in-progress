@@ -610,7 +610,7 @@ let options = {
         numUp: function() {
             return this.part()==="Text-2pp Cut and Stack" && finalValues.trimHeight <=234 && finalValues.trimWidth <=156 ? 4
             : this.part()==="Text-4pp Cut and Stack" && finalValues.trimHeight <=234 && finalValues.trimWidth <=156 || this.part()==="Text-2pp Cut and Stack" && finalValues.trimHeight <=297 && finalValues.trimWidth <=210 ? 2
-            : this.part()==="Text-4pp Cut and Stack" && finalValues.trimWidth <=215 || this.part()==="Text-2pp Cut and Stack" ? 1
+            : this.part()==="Text-4pp Cut and Stack" && finalValues.trimWidth <=215 || this.part()==="Text-2pp Cut and Stack" || this.part()==="Text-8pp Fold" ? 1
             : "Seek Advice"
         },
         numSheets: function() {return "Add Calc"},
@@ -963,16 +963,6 @@ let addToggle = (item) => {
         document.querySelector(`.${item}-hidden`).classList.toggle("no-display")
     })
 }
-
-
-
-
-
-
-
-
-
-
 
 
 //BOX CALCULATOR?
