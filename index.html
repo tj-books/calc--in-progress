@@ -32,13 +32,13 @@
             <h2 class="mt-lg-5" id="title">TJ Books Printing Calculator</h2>
         </div>
         <div class="row pt-2 text-light h5"> 
-            <div class="col-lg-5 left px-5 mt-2">
+            <div class="col-lg-5 input-area left mb-1">
                 <form>
                     <div class="row print-row">
                         <!--Print Method Select -->
                         <div class="col-lg-4 pt-2 mb-3">
                             <label for="print-method" class="col-form-label col-form-label-md">Print Method</label>
-                            <select name="printMethod" required id="print-method" class="form-select form-select-lg input-field" aria-label="">
+                            <select name="printMethod" required id="print-method" class="form-select form-select-md input-field" aria-label="">
                                 <option selected value="none">Print Method</option>
                                 <option value="litho"> Litho</option>
                                 <option value="digital"> Digital</option>
@@ -48,14 +48,14 @@
                         <!--Binding Style Select-->
                         <div class="col-lg-4 pt-2 mb-3">
                             <label for="bind-method" class="col-form-label col-form-label-md">Bind Method</label>
-                            <select name="bindMethod" required id="bind-method" class="form-select form-select-lg input-field" aria-label="">
+                            <select name="bindMethod" required id="bind-method" class="form-select form-select-md input-field" aria-label="">
                                 <option value="none" selected disabled>Bind Method</option>
                             </select>
                         </div>
                         <!--Colour Select-->
                         <div class="col-lg-4 pt-2 mb-3">
                             <label for="colourSelect" class="col-form-label col-form-label-md">Text Colour</label>
-                            <select name="colour" required id="colour-select" class="form-select form-select-lg input-field">
+                            <select name="colour" required id="colour-select" class="form-select form-select-md input-field">
                                 <option value="none" selected disabled>Text Colour</option>
                                 <option value="mono">Mono</option>
                                 <option value="colour">Colour</option>
@@ -65,24 +65,25 @@
 
                     <div class="row">
                         <!--Extent Input-->
-                        <div class="col-lg-3 mb-1 pt-2">
-                            <label for="extent" class="col-form-label col-form-label-md">Extent (Excl. Plates):</label>
-                            <input required type="number" name="extent" class="form-control form-control-lg input-field" id="extent" placeholder="Extent">
+                        <div class="col-lg-3 pt-2">
+                            <label for="extent" class="col-form-label col-form-label-md">Extent:</label>
+                            <input required type="number" name="extent" class="form-control form-control-md input-field" id="extent" placeholder="Extent">
+                            <p class="added-note pt-1">(Excluding Plates)</p>
                         </div>
                         <!--Trim Height-->
-                        <div class="col-lg-3 mb-1 pt-2">
-                            <label for="trim-height" class="col-form-label col-form-label-md">Trim Height (mm):</label>
-                            <input required type="number" name="trimHeight" class="form-control form-control-lg input-field" id="trim-height"placeholder="Trim Height">
+                        <div class="col-lg-3 pt-2">
+                            <label for="trim-height" class="col-form-label col-form-label-md">Trim Height:</label>
+                            <input required type="number" name="trimHeight" class="form-control form-control-md input-field" id="trim-height"placeholder="Height (mm)">
                         </div>
                         <!--Trim Width-->
-                        <div class="col-lg-3 mb-1 pt-2">
-                            <label for="trim-width" class=" col-form-label col-form-label-md">Trim Width (mm):</label>
-                            <input required type="number" name="trimWidth" class="form-control form-control-lg input-field" id="trim-width" placeholder="Trim Width">
+                        <div class="col-lg-3 pt-2">
+                            <label for="trim-width" class=" col-form-label col-form-label-md">Trim Width:</label>
+                            <input required type="number" name="trimWidth" class="form-control form-control-md input-field" id="trim-width" placeholder="Width (mm)">
                         </div>
                         <!--Case Style Select -->
-                        <div class="col-lg-3 pt-2 mb-1">
-                            <label for="case-style" class="col-form-label col-form-label-md">Limp / PPC / Cloth</label> 
-                            <select required id="case-style" name="caseOption" class="form-select form-select-lg input-field"
+                        <div class="col-lg-3 pt-2 ">
+                            <label for="case-style" class="col-form-label col-form-label-md">Case Style</label> 
+                            <select required id="case-style" name="caseOption" class="form-select form-select-md input-field"
                                 aria-label="">
                                 <option selected value="none">Case Style</option>
                                 <option value="fourPage"> 4pp Cover</option>
@@ -97,8 +98,7 @@
                         <div id="case-style-additional" class="col-lg-12">
                             <div class="plate-option row">
                                 <!--Plate Section Select-->
-                                <label for="plates" class="col-form-label col-form-label-md">Plates:</label>
-                                <select required id='plates' name="platesValue" class='form-select form-select-lg  input-field'>
+                                <select required id='plates' name="platesValue" class='form-select form-select-md mt-0 input-field'>
                                     <option value='no' selected>No Plate Section</option>
                                     <option value='yes'> With Plate Section</option>
                                 </select>
@@ -106,17 +106,17 @@
                                     <div class="row">
                                         <!--Plate Extent Input-->
                                         <div class="col-lg-3">
-                                            <input class="form-control form-control-lg mt-3 input-field" name="plates" type="number" placeholder="Extent" id="plate-extent">
+                                            <input class="form-control form-control-md input-field m-sm-0 mb-1" name="plates" type="number" placeholder="Extent" id="plate-extent">
                                         </div>
                                         <!--Plate Paper Input-->
                                         <div class="col-lg-6">
-                                            <select id='plate-paper' name="platePaper" class='mt-3 form-select form-select-lg input-field'>
+                                            <select id='plate-paper' name="platePaper" class='form-select form-select-md input-field m-sm-0 mb-1'>
                                                 <option value="none" selected disabled>Plate Paper Type</option>
                                             </select>
                                         </div>
                                         <!--Plate Grammage Input-->
                                         <div class="col-lg-3">
-                                            <select id='plate-grammage' name="plateGrammage" class='mt-3 form-select form-select-lg input-field'>
+                                            <select id='plate-grammage' name="plateGrammage" class='form-select form-select-md input-field m-sm-0 mb-1'>
                                                 <option value="none" selected disabled>Gsm</option>
                                             </select>
                                         </div>
@@ -126,23 +126,23 @@
                             <div class="cased-options">
                                 <div class="row">
                                     <!--Jacket Select-->
-                                    <div class="col-lg-4 ps-lg-4 m-lg-0 m-2">
-                                        <select id='jackets' name="jacket" class='form-select form-select-lg input-field'>
+                                    <div class="col-lg-4 ">
+                                        <select id='jackets' name="jacket" class='form-select form-select-md input-field m-sm-0 mb-1'>
                                             <option value='no' selected>No Jacket</option>
                                             <option value='yes'> With Jacket</option>
                                         </select>
                                     </div>
                                     <!--Spine Style Select-->
-                                    <div class="col-lg-4 m-lg-0 m-2">
-                                        <select id='spine-style' name="spineStyle" class='form-select form-select-lg input-field'>
+                                    <div class="col-lg-4 ">
+                                        <select id='spine-style' name="spineStyle" class='form-select form-select-md input-field m-sm-0 mb-1'>
                                             <option value='0' selected>Round & Back</option>
                                             <option value='2'> Press Pahn </option>
                                             <option value='4'>Board Hollow</option>
                                         </select>
                                     </div>
                                     <!--Greyboard Thickness Select-->
-                                    <div class="col-lg-4 pe-lg-4 m-lg-0 m-2">
-                                        <select id='greyboard' name="greyboardThickness" class='form-select form-select-lg input-field'>
+                                    <div class="col-lg-4 ">
+                                        <select id='greyboard' name="greyboardThickness" class='form-select form-select-md input-field m-sm-0 mb-1'>
                                             <option value='190' selected> 1.9mm/2mm </option>
                                             <option value='225'> 2.25mm </option>
                                             <option value='250'> 2.5mm</option>
@@ -157,43 +157,40 @@
                     
                     <div class="row">
                         <!--Paper-Type Select-->
-                        <div class="col-lg-6 pt-2 mb-3">
+                        <div class="col-lg-6 mb-3">
                             <label for="paper-type" class="col-form-label col-form-label-md"> Paper Type:</label>
-                            <select required id="paper-type" name="paper" class="form-select form-select-lg input-field" aria-label="">
+                            <select required id="paper-type" name="paper" class="form-select form-select-md input-field" aria-label="">
                                 <option value="none" selected disabled>Paper Type</option>
                             </select>
                         </div>
                         <!--Paper Grammage Select-->
-                        <div class="col-lg-3 pt-2 mb-3">
+                        <div class="col-lg-3 mb-3">
                             <label for="grammage" class="col-form-label col-form-label-md"> Grammage:</label>
-                            <select required id="grammage" name="grammage" class="form-select form-select-lg input-field" aria-label="">
+                            <select required id="grammage" name="grammage" class="form-select form-select-md input-field" aria-label="">
                                 <option value="none" selected disabled>Grammage</option>
                             </select>
                         </div>
                         <!--Quantity Input-->
-                        <div class="col-lg-3 mb-1 pt-2">
+                        <div class="col-lg-3 mb-1 ">
                             <label for="qty" class="col-form-label col-form-label-md input-field"> Quantity:</label>
-                            <input required type="number" name="quantity" class="form-control form-control-lg input-field" id="qty" placeholder="Quantity">
+                            <input required type="number" name="quantity" class="form-control form-control-md input-field" id="qty" placeholder="Quantity">
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="row">
-                            <div class="col-md-4">
-                                <label for="additional" class="col-form-label col-form-label-md">Additional Options:</label>
+                            <div class="col-md-12">
+                                <label for="additional" class="col-form-label col-form-label-md pb-2">Additional Options: <span class="added-note">(Not Required)</span></label>            
                             </div>
-
-                            
-                        
                         </div>
                         <div class="additional-options row">
 
                             <div class="col-md-6">
                                 <div class="row">
-                                    <div class="col-6">
+                                    <div class="col-md-6 mt-sm-1 col-9">
                                         <label for="pantone">Pantone Cover</label>
                                     </div>
-                                    <div class="col-1">
+                                    <div class="col-1 mt-sm-1">
                                         <input type="checkbox" name="pantone" id="pantone" class="checkbox-field">
                                     </div>
                                     <div class="col-5">
@@ -203,7 +200,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="row">
-                                    <div class="col-8">
+                                    <div class="col-md-7 col-sm-6 col-9 mb-sm-0 mb-4">
                                         <label for="soft-touch">SoftTouch/AntiScuff</label>
                                     </div>
                                     <div class="col-1">
@@ -213,10 +210,10 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="row">
-                                    <div class="col-6">
+                                    <div class="col-md-6 mt-sm-1 col-9">
                                         <label for="emboss">Emboss/Deboss</label>
                                     </div>
-                                    <div class="col-1">
+                                    <div class="col-1 mt-sm-1">
                                         <input type="checkbox" name="emboss" id="emboss" class="checkbox-field">
                                     </div>
                                     <div class="col-5">
@@ -231,7 +228,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="row">
-                                    <div class="col-8">
+                                    <div class="col-md-7 col-sm-6 col-9 mb-sm-0 mb-4">
                                         <label for="head-tail">Head & Tail Bands</label>
                                     </div>
                                     <div class="col-1">
@@ -241,10 +238,10 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="row">
-                                    <div class="col-6">
+                                    <div class="col-md-6 mt-sm-1 col-9">
                                         <label for="spot-uv">Spot UV</label>
                                     </div>
-                                    <div class="col-1">
+                                    <div class="col-1 mt-sm-1">
                                         <input type="checkbox" name="spotUV" id="spot-uv" class="checkbox-field">
                                     </div>
                                     <div class="col-5">
@@ -257,7 +254,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="row">
-                                    <div class="col-8">
+                                    <div class="col-md-7 col-sm-6 col-9 mb-sm-0 mb-4">
                                         <label for="ribbon">Ribbon Markers</label>
                                     </div>
                                     <div class="col-1">
@@ -267,10 +264,10 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="row">
-                                    <div class="col-6">
+                                    <div class="col-md-6 mt-sm-1 col-9">
                                         <label for="foil">Extra Foiling</label>
                                     </div>
-                                    <div class="col-1">
+                                    <div class="col-1 mt-sm-1">
                                         <input type="checkbox" name="foil" id="foil" class="checkbox-field">
                                     </div>
                                     <div class="foilingOptions col-5">
@@ -279,7 +276,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="row twoPageEndpapers">
-                                    <div class="col-8">
+                                    <div class="col-md-7 col-sm-6 col-9 mb-sm-0 mb-4">
                                         <label for="twoPageEndPapers">2pp Endpapers</label>
                                     </div>
                                     <div class="col-1">
@@ -289,10 +286,10 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="row text-pantone mt-1">
-                                    <div class="col-6">
+                                    <div class="col-md-6 mt-sm-1 col-9">
                                         <label for="text-pantone">Pantone Text</label>
                                     </div>
-                                    <div class="col-1">
+                                    <div class="col-1 mt-sm-1">
                                         <input disabled type="checkbox" name="textPantone" id="text-pantone" class="checkbox-field">
                                     </div>
                                     <div class="col-5">
@@ -319,7 +316,7 @@
 
 
 
-            <div class="col-lg-7 results-section right text-light">
+            <div class="col-lg-7 p-4 results-section right text-light">
                 <div class="row">
                     <h6 class="text-white h5 text-center">RESULTS</h6>
                 </div>
