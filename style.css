@@ -66,14 +66,14 @@ h2 {
 }
 
 .submit-btn {
-    background-color: rgba(1, 49, 53, 0.5);
+    background-color: rgb(71, 128, 124);
     width: 100%;
     margin-top: 3rem;
     font-size: 2rem;
     color: rgb(255, 255, 255);
     border: 1px solid white;
-    box-shadow: 0.2rem 0.3rem 0.4rem rgba(47, 158, 121, 0.3);
-    transition: all 1s ease-in-out;
+    box-shadow: 0.2rem 0.3rem 0.4rem rgba(11, 97, 67, 0.3);
+    transition: all 0.5s ease-in-out;
     border: none;
     text-shadow: 0.2rem 0.2rem 0.5rem rgba(0, 0, 0, 0.63);
 }
@@ -82,8 +82,12 @@ p {
     font-size: 1rem;
 }
 
+.added-note {
+    font-size: 0.7rem;
+}
+
 .btn:hover {
-    background-color: rgb(71, 128, 124);
+    background-color: rgb(16, 88, 84);
     color: white;
 }
 
@@ -98,7 +102,7 @@ p {
 .headings {
     border-radius: 0.25rem;
     background: rgba(1, 49, 53, 0.5);
-    box-shadow: -0.1rem 0.1rem 0.2rem rgba(47, 158, 121, 0.3);
+    box-shadow: -0.1rem 0.1rem 0.2rem rgba(15, 48, 37, 0.3);
 
 }
 
@@ -217,3 +221,45 @@ p {
     display: none;
 }
 
+.flap-width-input {
+    font-size: 0.65rem;
+    width: 150%;
+}
+
+.flap-width-button {
+    background:rgb(1, 75, 75);
+    color: white;
+    transform: scale(1.2);
+}
+
+i:hover {
+    color: rgb(149, 194, 155);
+}
+
+.input-area {
+    background-color: rgba(13, 22, 15, 0.144);
+    padding: 3rem;
+    border-radius: 0.7rem;
+}
+
+.heading-sm {
+    display: none;
+}
+
+@media (max-width: 576px ) {
+    .heading-sm {
+        display: inline;
+    }
+    .headings {
+        display: none;
+    }
+    .result-line::after {
+        content: "";
+        position: absolute;
+        height: 10%;
+        width: 80%;
+        box-shadow: 0rem 0.1rem 0.1rem rgba(225,225,225,0.5);
+        right: 10%;
+        top: 80%;
+    }
+}
