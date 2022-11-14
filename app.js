@@ -39,28 +39,6 @@ const login = () => {
 }
 
 
-
-/*const login = () => {
-    let email = document.querySelector("#name").value
-    let password = document.querySelector("#password").value
-    firebase.auth().signInWithEmailAndPassword(email, password)
-  .then((userCredential) => {
-    console.log("signed in")
-    document.querySelector(".sign-in").style.display = "none"
-    document.querySelector(".calculator").classList.remove("password-protected")
-    // Signed in
-    var user = userCredential.user;
-    // ...
-  })
-  .catch((error) => {
-    var errorCode = error.code;
-    var errorMessage = error.message;
-  });
-}
-*/
-
-
-
 //STOCK OPTIONS
 let bindOptions = {
     "litho": ["Notched", "Sewn"],
@@ -165,11 +143,11 @@ let lithoSheets = {
         width: 1212
     }],
     "colour": [{
-        height: 720,
-        width: 1020
-    }, {
         height: 640,
         width: 900
+    }, {
+        height: 720,
+        width: 1020
     }]
 }
 
@@ -224,25 +202,25 @@ document.querySelector("#print-method").addEventListener("change", (e)=> {
 })
 
 //Select Paper type- Update Options for Grammage
-document.querySelector("#paper-type").addEventListener("click", (e)=> {
+document.querySelector("#paper-type").addEventListener("change", (e)=> {
     let selectedPaper = document.querySelector("#paper-type").value
     createNewOption(paperOptions[document.querySelector("#print-method").value], "#grammage", "Grammage", true, false, selectedPaper)
 })
 
 //Select Plates- Update Options for Plate Paper
-document.querySelector("#plates").addEventListener("click", ()=> {
+document.querySelector("#plates").addEventListener("change", ()=> {
     document.querySelector(".plate-extent").style.display = document.querySelector("#plates").value !== "yes" ? "none" : "inline"
     createNewOption(paperOptions["plates"], "#plate-paper", "Plate Paper Type", true, true, false)
 })
 
 //Select Plate Paper- Update Options for Grammage
-document.querySelector("#plate-paper").addEventListener("click", (e)=> {
+document.querySelector("#plate-paper").addEventListener("change", (e)=> {
     let selectedPaper = document.querySelector("#plate-paper").value
     createNewOption(paperOptions["plates"], "#plate-grammage", "Grammage", true, false, selectedPaper)
 })
 
 //Select Case Type- Update Options Available for Plates, Case Finishes etc.
-document.querySelector("#case-style").addEventListener("click", (e)=> {
+document.querySelector("#case-style").addEventListener("change", (e)=> {
     let value = document.querySelector("#case-style").value
     document.querySelector(".plate-option").style.display = value === "none"? "none" : "inline"
     document.querySelector(".plate-extent").style.display = document.querySelector("#plates").value === "yes" ? "inline" : "none"
@@ -266,17 +244,21 @@ document.querySelector("#case-style").addEventListener("click", (e)=> {
 
 let notApplicable = `<span class="n-a">N/A</span>`
 
+//Function to calculate ideal sheet size for covers
 let sheetCalc = (part, press)=> {
     let basicWidth = finalValues.trimWidth*2+ calcSpineWidth()
     return press === "KBA 3" ? "720 x 1020"
     : press === "Outwork" || !press ? notApplicable 
     : basicWidth+40+parseInt(finalValues.spineStyle) <=417 && part === "PPC" || basicWidth <=402 && part === "fourPage" && !fourson480? "320 x 450"
     : basicWidth+200 <=492 && part === "Jacket" || basicWidth+40+parseInt(finalValues.spineStyle) <=536 && part === "PPC" || basicWidth+209 <=546 && part === "eightPage" || basicWidth <= 512 && part === "fourPage" || fourson480 ? "320 x 560"
+    : basicWidth+140 <= 492 && part === "Jacket" ? `Enter Flap Width`
     : basicWidth+200 <=597 && part === "Jacket" ? "320 x 660"
-    : basicWidth+ 200 > 597 && part === "Jacket" ? "320 x 700"
+    : basicWidth+140 <= 597 && part === "Jacket" ? `Enter Flap Width`
+    : basicWidth+ 200 > 597 && basicWidth+ 200 < 635 && part === "Jacket" ? "320 x 700"
     : "Seek Advice"
 } 
 
+//Function to check component rules and determine print method for covers
 let checkCoverPress = (maxQty) => {
     return finalValues.spotUV && finalValues.spotUVBleeds === "with-bleeds" || finalValues.foil && finalValues.caseOption !== "Cloth" || finalValues.emboss ? "Outwork" 
     : finalValues.pantone || finalValues.quantity >= maxQty ? "KBA 3"
@@ -284,12 +266,14 @@ let checkCoverPress = (maxQty) => {
     : "Ricoh 9200"
 }
 
+//Function to calculate spine width
 let textSpine;
 let calcSpineWidth = ()=> {   
     textSpine = finalValues.plates>0 && finalValues.platesValue === "yes" ? (((volumes[finalValues.paper] * finalValues.grammage) * finalValues.extent )/20000)+ 0.6 + (((volumes[finalValues.platePaper] * finalValues.plateGrammage) * finalValues.plates)/20000) : (((volumes[finalValues.paper] * finalValues.grammage) * finalValues.extent )/20000)+ 0.6
     return finalValues.caseOption === "fourPage" || finalValues.caseOption === "eightPage" ? Math.round(textSpine) : Math.round(textSpine + (parseInt(finalValues.greyboardThickness)/100)*2)
 }
 
+//Function to calculate number of sheets for covers
 let calculateCoverNumSheets = (percent, makeReady, numUp)=> {
     return Math.floor(((finalValues.quantity*percent)/numUp)+makeReady)
 }
@@ -319,8 +303,9 @@ let options = {
         },
         extras: function () {return this.press()==="Outwork" && finalValues.pantone ? ` £${Math.floor(100* calcSAPCPrice("Jacket", "5/0"))/100}`
         : this.press()==="Outwork" ? `£${Math.floor(100* calcSAPCPrice("Jacket", "4/0"))/100}`
+        : this.sheetSize()==="Enter Flap Width" ? `<input class="ms-1 flap-width-input form-control form-control-sm mt-1" placeholder = "Flap Width" type="number">`
         : ""},
-        extrasInfo: function () {return ""},
+        extrasInfo: function () {return this.sheetSize()==="Enter Flap Width" ? `<i class="fa-solid fa-calculator flap-width-button mt-1"></i>` : ""},
         info: function () {return ""},
     },
     "Cloth": {
@@ -388,7 +373,7 @@ let options = {
                 additionalInfo += `Head and Tail Bands: ${Math.round(calcSpineWidth()*2*(finalValues.quantity*1.05)*1.1/1000)}m <br>`
             }
             if (finalValues.ribbon) {
-                additionalInfo += `Ribbon: ${Math.round(parseInt(finalValues.trimHeight)+150*(finalValues.quantity*1.05)*1.1/1000)}m <br>`
+                additionalInfo += `Ribbon: ${Math.round((((parseInt(finalValues.trimHeight)+150)*(finalValues.quantity*1.05))*1.1)/1000)}m <br>`
             }
             return additionalInfo
         },
@@ -508,7 +493,7 @@ let options = {
         press: function () {return notApplicable},
         ink: function () {return notApplicable},
         spine: function () {return notApplicable},
-        size: function () {return `${parseInt(finalValues.trimHeight)+6}mm x ${(finalValues.trimWidth)+3}mm`},
+        size: function () {return `${parseInt(finalValues.trimHeight)+6}mm x ${(parseInt(finalValues.trimWidth))+3}mm`},
         sheetSize: function () {return "640 x 970"},
         numUp: function () { 
             let endPaperHeight = this.sheetSize() === "640 x 970" ? 970 : 760
@@ -558,7 +543,7 @@ let options = {
         size: function () {return options["Text-Litho"].size()},
         spine: function() {return notApplicable},
         sheetSize: function () {return options["Text-Litho"].sheetSize()},
-        numUp: function () {return options["Text-Litho"].part() === "Text-24pp" ? 6 : (options["Text-Litho"].numUp())*4},
+        numUp: function () {return options["Text-Litho"].part() === "Text-24pp" ? 6 : options["Text-Litho"].part() === "Text-16pp" ? 2 : (options["Text-Litho"].numUp())*4},
         numSheets: function() {return this.press()==="KBA 1" ? Math.round((finalValues.quantity * 1.04 + 150)/this.numUp()) : Math.round((finalValues.quantity * 1.1 * Math.floor(finalExtent/impositionLitho) + 150)/this.numUp()) },
         extras: function() {return ""},
         extrasInfo: function() {return "1x8pp"},
@@ -621,9 +606,9 @@ let options = {
             : this.part() === "Text-4pp Fold" ? 4
             : 2
             finalExtent = finalValues.extent%impositionIX === 0 ? finalValues.extent : parseInt(finalValues.extent) + (impositionIX-(finalValues.extent%impositionIX))
-            return `${finalExtent}pp - ${finalExtent/impositionIX}x${impositionIX}pp`
+            return `${finalExtent}pp`
         },
-        extrasInfo: function() {return ""},
+        extrasInfo: function() {return `${finalExtent/impositionIX}x${impositionIX}pp`},
         info: function() {return ""}
     },
     "Text-Plate" : {
@@ -643,9 +628,12 @@ let options = {
             let imposition = finalValues.printMethod==="digital" || finalValues.printMethod==="IX" ? impositionIX 
             : this.part()==="Text-8pp Plate Fold" ? 8 : 4
             let plateExtent = finalValues.plates%imposition === 0 ? finalValues.plates : parseInt(finalValues.plates) + (imposition-(finalValues.plates%imposition))
-            return `${plateExtent}pp - ${plateExtent/imposition}x${imposition}pp`
+            return `${plateExtent}pp`
         },
-        extrasInfo: function() {return ""},
+        extrasInfo: function() {
+            let imposition = finalValues.printMethod==="digital" || finalValues.printMethod==="IX" ? impositionIX 
+            : this.part()==="Text-8pp Plate Fold" ? 8 : 4
+            return `${plateExtent/imposition}x${imposition}pp`},
         info: function() {return ""}
     },
 }
@@ -673,8 +661,9 @@ let generateGreyboardSizes = (arr, newArr) => {
 
 let lithoCalc = (value) => {
     let sizes = []
+    let widthTrim = finalValues.caseOption === "eightPage" ? 5 : 3
     let heightBleeds = parseInt(finalValues.trimHeight)+6
-    let widthBleeds = parseInt(finalValues.trimWidth)+3
+    let widthBleeds = parseInt(finalValues.trimWidth)+widthTrim
     sizes.push(heightBleeds*4, widthBleeds*8, heightBleeds*4, widthBleeds*6, heightBleeds*4, widthBleeds*4, heightBleeds*2, widthBleeds*4)
     let sheetOptions = finalValues.textPantone || finalValues.colour==="colour" ? "colour" : "mono"
     for (let i=0; i<sizes.length; i+=2) {
@@ -751,6 +740,8 @@ document.querySelector("#submit").addEventListener("click", ()=> {
             revertOptions("Jacket")
             if (options["Jacket"].press()==="Outwork") {
                 recalculateSAPC("Jacket", outworkInk)
+            } else if (options["Jacket"].sheetSize()==="Enter Flap Width") {
+                testFlapSize("Jacket")
             }
         }
         createResult(finalValues.caseOption)
@@ -918,41 +909,41 @@ const createResult = (part)=> {
     newElement.classList.add("results")
     newElement.classList.add("mt-3")
     newElement.innerHTML = `
-<div class="col col-lg-1 result-line">
-<p>${options[part].part()}</p>
+<div class="col col-md-1 col-12 result-line">
+    <p><span class="heading-sm">Part: </span>${options[part].part()}</p>
 </div>
-<div class="col col-lg-1 result-line">
-    <p>${options[part].press()}</p>
+<div class="col col-md-1 col-12 result-line">
+    <p><span class="heading-sm">Press: </span>${options[part].press()}</p>
 </div>
-<div class="col col-lg-1 result-line">
-    <p class="${part}ink">${options[part].ink()}</p>
+<div class="col col-md-1 col-12 result-line">
+    <p class="${part}ink"><span class="heading-sm">Ink: </span>${options[part].ink()}</p>
 </div>
-<div class="col col-lg-1 result-line">
-<p>${options[part].spine()}</p>
+<div class="col col-md-1 col-12 result-line">
+    <p><span class="heading-sm">Spine: </span>${options[part].spine()}</p>
 </div>
-<div class="col col-lg-2 result-line">
-<p>${options[part].size()}</p>
+<div class="col col-md-2 col-12 result-line">
+    <p><span class="heading-sm">Size: </span>${options[part].size()}</p>
 </div>
-<div class="col col-lg-2 result-line">
-<p class="${part}sheet">${options[part].sheetSize()}</p><p></p><i class="fa-solid fa-circle-plus ${part}adjust mb-3 ms-3"></i></p>
+<div class="col col-md-2 col-12 result-line">
+    <p class="${part}sheet"><span class="heading-sm">Sheet Size: </span>${options[part].sheetSize()}</p><p></p><i class="fa-solid fa-circle-plus ${part}adjust mb-3 ms-3"></i></p>
 </div>
-<div class="col col-lg-1 result-line">
-<p class="${part}NumUp">${options[part].numUp()}</p>
+<div class="col col-md-1 col-12 result-line">
+    <p class="${part}NumUp"><span class="heading-sm">Num Up: </span>${options[part].numUp()}</p>
 </div>
-<div class="col col-lg-1 result-line">
-<p class="${part}NumSheets">${options[part].numSheets()}</p>
+<div class="col col-md-1 col-12 result-line">
+    <p class="${part}NumSheets"><span class="heading-sm">Num Sheets: </span>${options[part].numSheets()}</p>
 </div>
-<div class="col col-lg-1">
-<p class="${part}extras me-3">${options[part].extras()}</p>
+<div class="col col-md-1 col-12">
+    <p class="${part}extras me-3"><span class="heading-sm">Extras: </span>${options[part].extras()}</p>
 </div>
-<div class="col col-lg-1">
-<p class="ms-auto">${options[part].extrasInfo()}</p>
-<p><i class="fa-solid fa-circle-plus ${part}-open mt-2 me-3"></i></p>
+<div class="col col-md-1 col-12">
+    <p class="ms-md-auto"><span></span>${options[part].extrasInfo()}</p>
+    <p><i class="fa-solid fa-circle-plus ${part}-open mt-sm-2 me-sm-3"></i></p>
 </div>
 <div class="row no-display ${part}-hidden">
-<div class="added-info col-lg-11 ms-auto">
-<p class="me-auto ${part}info"> ${options[part].info()}</p>
-</div>
+    <div class="added-info col-lg-11 ms-md-auto">
+        <p class="me-auto ${part}info"> ${options[part].info()}</p>
+    </div>
 </div>
     `
     document.querySelector(".append-results").appendChild(newElement)
@@ -964,10 +955,24 @@ let addToggle = (item) => {
     })
 }
 
+let testFlapSize = (part)=> {
+    document.querySelector(".flap-width-button").addEventListener("click", ()=> {
+        document.querySelector(`.${part}sheet`).innerHTML = document.querySelector(".flap-width-input").value < 70 ? "Flap Width Too Small" 
+        : document.querySelector(".flap-width-input").value > 100 ? "Flap Width Too Large"
+        : parseInt(finalValues.trimWidth)*2 + options[part].spine() + (document.querySelector(".flap-width-input").value * 2) <= 492 ? "320 x 560"
+        : parseInt(finalValues.trimWidth)*2 + options[part].spine() + (document.querySelector(".flap-width-input").value * 2) <= 597 ? "320 x 660" 
+        : parseInt(finalValues.trimWidth)*2 + options[part].spine() + (document.querySelector(".flap-width-input").value * 2) <= 635 ? "320 x 700"
+        : "Seek Advice"
+        document.querySelector(".flap-width-input").style.border = document.querySelector(`.${part}sheet`).innerHTML === "Flap Width Too Large" || document.querySelector(`.${part}sheet`).innerHTML === "Flap Width Too Small" ? "3px solid rgba(253, 120, 120, 0.719)" : "none"
+    })
 
-//BOX CALCULATOR?
+}
+
+
+//Measurement for paper- when does sheet size need to increase for an 8pp cover- is it 5mm on foreedge or 8mm?
+//ask about colour litho jobs- is 1020x720 correct or wrong grain direction- how should the calculation work?
+//plate sections need work
 //INK CALCULATOR?
-//OUTWORK 8PP FOLDING
-//FLAP SIZE FOR JACKET AND FOR 8PP COVER
+//OUTWORK 8PP FOLDING- what are max and min flap sizes
+//FLAP SIZE FOR 8PP COVER
 //TEXT SIZE INCREASING FOR LITHO JOBS IF AN 8PP COVER
-//ADD PASSWORD FOR ACCESS
