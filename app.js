@@ -327,7 +327,7 @@ let options = {
         extras: function () {return ""},
         extrasInfo: function () {return ""},
         info: function () {
-            let additionalInfo = `Foil (Spine Only): ${Math.round(calcSpineWidth()*(finalValues.quantity*1.05)*1.1/1000)}m <br>`
+            let additionalInfo = `Foil (Spine Only): ${Math.floor(calcSpineWidth()*(finalValues.quantity*1.05)*1.1/1000)+1}m <br>`
             if (finalValues.foil) {
                 additionalInfo = `Foil: ${Math.round(finalValues.foilCoverage*(finalValues.quantity*1.05)*1.1/1000)}m <br>`
             } 
